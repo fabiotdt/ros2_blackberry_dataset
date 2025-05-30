@@ -1,0 +1,3 @@
+[console_scripts]
+ur_publisher = ur_simulator.ur_publisher:main
+

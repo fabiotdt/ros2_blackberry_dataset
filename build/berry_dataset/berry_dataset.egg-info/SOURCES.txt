@@ -1,0 +1,15 @@
+package.xml
+setup.cfg
+setup.py
+berry_dataset/__init__.py
+berry_dataset/berry_dataset.py
+berry_dataset/dataset_saver.py
+berry_dataset/utils.py
+berry_dataset.egg-info/PKG-INFO
+berry_dataset.egg-info/SOURCES.txt
+berry_dataset.egg-info/dependency_links.txt
+berry_dataset.egg-info/entry_points.txt
+berry_dataset.egg-info/requires.txt
+berry_dataset.egg-info/top_level.txt
+berry_dataset.egg-info/zip-safe
+resource/berry_dataset

@@ -1,0 +1,20 @@
+[1.817s] Invoking command in '/home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package/build --no-deps install_data
+[2.076s] running develop
+[2.077s] /usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+[2.077s]   warnings.warn(
+[2.078s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[2.078s]   warnings.warn(
+[2.273s] running egg_info
+[2.273s] writing launch_package.egg-info/PKG-INFO
+[2.274s] writing dependency_links to launch_package.egg-info/dependency_links.txt
+[2.274s] writing entry points to launch_package.egg-info/entry_points.txt
+[2.274s] writing requirements to launch_package.egg-info/requires.txt
+[2.274s] writing top-level names to launch_package.egg-info/top_level.txt
+[2.276s] reading manifest file 'launch_package.egg-info/SOURCES.txt'
+[2.283s] writing manifest file 'launch_package.egg-info/SOURCES.txt'
+[2.318s] running build_ext
+[2.318s] Creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/lib/python3.10/site-packages/launch-package.egg-link (link to .)
+[2.319s] 
+[2.319s] Installed /home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package
+[2.319s] running install_data
+[2.378s] Invoked command in '/home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package' returned '0': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package/build --no-deps install_data

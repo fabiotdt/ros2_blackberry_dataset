@@ -1,0 +1,9 @@
+source;share/berry_dataset/hook/pythonpath.ps1
+source;share/berry_dataset/hook/pythonpath.dsv
+source;share/berry_dataset/hook/pythonpath.sh
+source;share/berry_dataset/hook/ament_prefix_path.ps1
+source;share/berry_dataset/hook/ament_prefix_path.dsv
+source;share/berry_dataset/hook/ament_prefix_path.sh
+source;../../build/berry_dataset/share/berry_dataset/hook/pythonpath_develop.ps1
+source;../../build/berry_dataset/share/berry_dataset/hook/pythonpath_develop.dsv
+source;../../build/berry_dataset/share/berry_dataset/hook/pythonpath_develop.sh
