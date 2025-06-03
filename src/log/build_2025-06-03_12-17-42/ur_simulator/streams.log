@@ -1,0 +1,28 @@
+[2.422s] Invoking command in '/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator/build --no-deps install_data
+[3.537s] running develop
+[3.540s] /usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+[3.540s]   warnings.warn(
+[3.542s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[3.542s]   warnings.warn(
+[4.669s] running egg_info
+[4.669s] creating ur_simulator.egg-info
+[4.670s] writing ur_simulator.egg-info/PKG-INFO
+[4.677s] writing dependency_links to ur_simulator.egg-info/dependency_links.txt
+[4.678s] writing entry points to ur_simulator.egg-info/entry_points.txt
+[4.678s] writing requirements to ur_simulator.egg-info/requires.txt
+[4.678s] writing top-level names to ur_simulator.egg-info/top_level.txt
+[4.678s] writing manifest file 'ur_simulator.egg-info/SOURCES.txt'
+[4.686s] reading manifest file 'ur_simulator.egg-info/SOURCES.txt'
+[4.686s] writing manifest file 'ur_simulator.egg-info/SOURCES.txt'
+[4.875s] running build_ext
+[4.875s] Creating /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/lib/python3.10/site-packages/ur-simulator.egg-link (link to .)
+[4.884s] Installing ur_publisher script to /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/lib/ur_simulator
+[4.885s] 
+[4.885s] Installed /home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator
+[4.885s] running install_data
+[4.885s] creating /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/share/ament_index
+[4.885s] creating /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/share/ament_index/resource_index
+[4.885s] creating /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/share/ament_index/resource_index/packages
+[4.886s] copying resource/ur_simulator -> /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/share/ament_index/resource_index/packages
+[4.886s] copying package.xml -> /home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/share/ur_simulator
+[5.363s] Invoked command in '/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator' returned '0': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/src/install/ur_simulator/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/src/build/ur_simulator/build --no-deps install_data

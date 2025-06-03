@@ -1,0 +1,28 @@
+[2.424s] Invoking command in '/home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer/build --no-deps install_data
+[3.216s] /usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+[3.216s]   warnings.warn(
+[3.221s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[3.222s]   warnings.warn(
+[3.222s] running develop
+[3.775s] running egg_info
+[3.775s] creating realsense_streamer.egg-info
+[3.775s] writing realsense_streamer.egg-info/PKG-INFO
+[3.776s] writing dependency_links to realsense_streamer.egg-info/dependency_links.txt
+[3.776s] writing entry points to realsense_streamer.egg-info/entry_points.txt
+[3.776s] writing requirements to realsense_streamer.egg-info/requires.txt
+[3.776s] writing top-level names to realsense_streamer.egg-info/top_level.txt
+[3.777s] writing manifest file 'realsense_streamer.egg-info/SOURCES.txt'
+[3.791s] reading manifest file 'realsense_streamer.egg-info/SOURCES.txt'
+[3.791s] writing manifest file 'realsense_streamer.egg-info/SOURCES.txt'
+[3.958s] running build_ext
+[3.963s] Creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/lib/python3.10/site-packages/realsense-streamer.egg-link (link to .)
+[3.967s] Installing RealSenseStreamer script to /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/lib/realsense_streamer
+[3.967s] 
+[3.967s] Installed /home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer
+[3.967s] running install_data
+[3.968s] creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/share/ament_index
+[3.971s] creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/share/ament_index/resource_index
+[3.971s] creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/share/ament_index/resource_index/packages
+[3.971s] copying resource/realsense_streamer -> /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/share/ament_index/resource_index/packages
+[3.972s] copying package.xml -> /home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/share/realsense_streamer
+[4.260s] Invoked command in '/home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer' returned '0': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/install/realsense_streamer/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/build/realsense_streamer/build --no-deps install_data

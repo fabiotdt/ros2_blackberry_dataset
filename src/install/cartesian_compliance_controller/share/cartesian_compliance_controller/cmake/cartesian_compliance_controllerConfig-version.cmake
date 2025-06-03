@@ -1,0 +1,1 @@
+/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/cartesian_compliance_controller/ament_cmake_core/cartesian_compliance_controllerConfig-version.cmake

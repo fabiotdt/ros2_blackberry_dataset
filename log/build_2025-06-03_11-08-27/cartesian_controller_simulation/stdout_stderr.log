@@ -1,0 +1,36 @@
+[ 25%] [32mBuilding CXX object CMakeFiles/mujoco_simulator.dir/src/mujoco_simulator.cpp.o[0m
+[ 50%] [32m[1mLinking CXX shared library libmujoco_simulator.so[0m
+[ 50%] Built target mujoco_simulator
+[ 75%] [32mBuilding CXX object CMakeFiles/cartesian_controller_simulation.dir/src/system_interface.cpp.o[0m
+[100%] [32m[1mLinking CXX shared library libcartesian_controller_simulation.so[0m
+[100%] Built target cartesian_controller_simulation
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation//cartesian_controller_simulation.xml
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/include/cartesian_controller_simulation/mujoco_simulator.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/include/cartesian_controller_simulation/system_interface.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/config/controller_manager.yaml
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/etc/initial_joint_states.xml
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/etc/robot.rviz
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/etc/robot_mujoco.xml
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/launch/simulation.launch.py
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/urdf/joint.urdf.xacro
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/urdf/robot.urdf.xacro
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/lib/libcartesian_controller_simulation.so
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/lib/libmujoco_simulator.so
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/ament_index/resource_index/package_run_dependencies/cartesian_controller_simulation
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/ament_index/resource_index/parent_prefix_path/cartesian_controller_simulation
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/environment/ament_prefix_path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/environment/ament_prefix_path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/environment/path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/environment/path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/local_setup.bash
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/local_setup.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/local_setup.zsh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/local_setup.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/package.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/ament_index/resource_index/packages/cartesian_controller_simulation
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/cartesian_controller_simulation
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/cmake/cartesian_controller_simulationConfig.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/cmake/cartesian_controller_simulationConfig-version.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_simulation/share/cartesian_controller_simulation/package.xml

@@ -1,0 +1,27 @@
+running develop
+/usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+  warnings.warn(
+/usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+  warnings.warn(
+running egg_info
+creating launch_package.egg-info
+writing launch_package.egg-info/PKG-INFO
+writing dependency_links to launch_package.egg-info/dependency_links.txt
+writing entry points to launch_package.egg-info/entry_points.txt
+writing requirements to launch_package.egg-info/requires.txt
+writing top-level names to launch_package.egg-info/top_level.txt
+writing manifest file 'launch_package.egg-info/SOURCES.txt'
+reading manifest file 'launch_package.egg-info/SOURCES.txt'
+writing manifest file 'launch_package.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/lib/python3.10/site-packages/launch-package.egg-link (link to .)
+
+Installed /home/fabio_tdt/Documents/ros2_dataset_ws/build/launch_package
+running install_data
+creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/ament_index
+creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/ament_index/resource_index
+creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/ament_index/resource_index/packages
+copying resource/launch_package -> /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/ament_index/resource_index/packages
+copying package.xml -> /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/launch_package
+creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/launch_package/launch_package
+copying launch_package/launch_pipeline.py -> /home/fabio_tdt/Documents/ros2_dataset_ws/install/launch_package/share/launch_package/launch_package

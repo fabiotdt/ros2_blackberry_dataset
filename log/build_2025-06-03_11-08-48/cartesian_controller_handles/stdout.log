@@ -1,0 +1,28 @@
+[35m[1mConsolidate compiler generated dependencies of target cartesian_controller_handles[0m
+[100%] Built target cartesian_controller_handles
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles//cartesian_controller_handles_plugin.xml
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/include/cartesian_controller_handles/motion_control_handle.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/lib/libcartesian_controller_handles.so
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/environment/library_path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/environment/library_path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/ament_index/resource_index/package_run_dependencies/cartesian_controller_handles
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/ament_index/resource_index/parent_prefix_path/cartesian_controller_handles
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/environment/ament_prefix_path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/environment/ament_prefix_path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/environment/path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/environment/path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/local_setup.bash
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/local_setup.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/local_setup.zsh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/local_setup.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/package.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/ament_index/resource_index/packages/cartesian_controller_handles
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/ament_index/resource_index/controller_interface__pluginlib__plugin/cartesian_controller_handles
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/cmake/ament_cmake_export_dependencies-extras.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/cmake/ament_cmake_export_include_directories-extras.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/cmake/ament_cmake_export_libraries-extras.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/cmake/cartesian_controller_handlesConfig.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/cmake/cartesian_controller_handlesConfig-version.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_handles/share/cartesian_controller_handles/package.xml

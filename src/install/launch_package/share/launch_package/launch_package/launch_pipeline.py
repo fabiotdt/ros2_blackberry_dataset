@@ -13,7 +13,7 @@ def generate_launch_description():
                               description='Run the RealSense camera node'),
         DeclareLaunchArgument('run_saver', default_value='true',
                               description='Run the berry saver node'),
-        DeclareLaunchArgument('run_trigger', default_value='true',
+        DeclareLaunchArgument('run_trigger', default_value='false',
                               description='Run the UR trigger node'),
 
         # RealSense streamer node
@@ -42,4 +42,6 @@ def generate_launch_description():
             output='screen',
             condition=IfCondition(LaunchConfiguration('run_trigger'))
         ),
+
+
     ])

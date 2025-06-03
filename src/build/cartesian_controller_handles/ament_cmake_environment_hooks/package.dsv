@@ -1,0 +1,4 @@
+source;share/cartesian_controller_handles/local_setup.bash
+source;share/cartesian_controller_handles/local_setup.dsv
+source;share/cartesian_controller_handles/local_setup.sh
+source;share/cartesian_controller_handles/local_setup.zsh

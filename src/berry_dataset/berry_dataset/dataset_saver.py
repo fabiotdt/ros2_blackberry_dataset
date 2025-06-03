@@ -36,6 +36,10 @@ class BerrySaver(Node):
 
         #self.timer = self.create_timer(2.0, self.save_data)
 
+    def transform_frame(self, T):
+        # TODO: transform reference frame: from arm base frame to camera frame
+        pass
+
     def color_callback(self, msg: Image):
         self.color_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 

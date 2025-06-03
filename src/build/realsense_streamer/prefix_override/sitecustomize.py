@@ -1,3 +1,3 @@
 import sys
 sys.real_prefix = sys.prefix
-sys.prefix = sys.exec_prefix = '/home/fabio_tdt/Documents/blackberry_pose/ros2_dataset_ws/src/install/realsense_streamer'
+sys.prefix = sys.exec_prefix = '/home/fabio_tdt/Documents/ros2_dataset_ws/src/install/realsense_streamer'

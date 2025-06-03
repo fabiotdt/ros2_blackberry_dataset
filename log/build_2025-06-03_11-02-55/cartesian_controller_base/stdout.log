@@ -1,0 +1,91 @@
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 1.3.7 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Found rclcpp: 16.0.8 (/opt/ros/humble/share/rclcpp/cmake)
+-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 6.2.6 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+-- Found FastRTPS: /opt/ros/humble/include  
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Found controller_interface: 2.37.0 (/opt/ros/humble/share/controller_interface/cmake)
+-- Found kdl_parser: 2.6.4 (/opt/ros/humble/share/kdl_parser/cmake)
+-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)
+-- Found Eigen3: TRUE (found version "3.4.0") 
+-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+-- Found urdf: 2.6.0 (/opt/ros/humble/share/urdf/cmake)
+-- Found realtime_tools: 2.5.0 (/opt/ros/humble/share/realtime_tools/cmake)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_base
+[  9%] [32mBuilding CXX object CMakeFiles/ik_solvers.dir/src/IKSolver.cpp.o[0m
+[ 18%] [32mBuilding CXX object CMakeFiles/cartesian_controller_base.dir/src/SpatialPDController.cpp.o[0m
+[ 27%] [32mBuilding CXX object CMakeFiles/cartesian_controller_base.dir/src/IKSolver.cpp.o[0m
+[ 36%] [32mBuilding CXX object CMakeFiles/ik_solvers.dir/src/ForwardDynamicsSolver.cpp.o[0m
+[ 45%] [32mBuilding CXX object CMakeFiles/cartesian_controller_base.dir/src/cartesian_controller_base.cpp.o[0m
+[ 54%] [32mBuilding CXX object CMakeFiles/cartesian_controller_base.dir/src/PDController.cpp.o[0m
+[ 63%] [32mBuilding CXX object CMakeFiles/ik_solvers.dir/src/DampedLeastSquaresSolver.cpp.o[0m
+[ 72%] [32mBuilding CXX object CMakeFiles/ik_solvers.dir/src/JacobianTransposeSolver.cpp.o[0m
+[ 81%] [32mBuilding CXX object CMakeFiles/ik_solvers.dir/src/SelectivelyDampedLeastSquaresSolver.cpp.o[0m
+[ 90%] [32m[1mLinking CXX shared library libcartesian_controller_base.so[0m
+[ 90%] Built target cartesian_controller_base
+[100%] [32m[1mLinking CXX shared library libik_solvers.so[0m
+[100%] Built target ik_solvers
+-- Install configuration: "Release"
+-- Execute custom install script
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base//ik_solver_plugin.xml
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/DampedLeastSquaresSolver.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/ForwardDynamicsSolver.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/IKSolver.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/JacobianTransposeSolver.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/PDController.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/ROS2VersionConfig.h.in
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/SelectivelyDampedLeastSquaresSolver.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/SpatialPDController.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/Utility.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/cartesian_controller_base.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/lib/libcartesian_controller_base.so
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/lib/libik_solvers.so
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/include/cartesian_controller_base/ROS2VersionConfig.h
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/environment/library_path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/environment/library_path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/ament_index/resource_index/package_run_dependencies/cartesian_controller_base
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/ament_index/resource_index/parent_prefix_path/cartesian_controller_base
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/environment/ament_prefix_path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/environment/ament_prefix_path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/environment/path.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/environment/path.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/local_setup.bash
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/local_setup.sh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/local_setup.zsh
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/local_setup.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/package.dsv
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/ament_index/resource_index/packages/cartesian_controller_base
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/ament_index/resource_index/cartesian_controller_base__pluginlib__plugin/cartesian_controller_base
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/cmake/ament_cmake_export_dependencies-extras.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/cmake/ament_cmake_export_include_directories-extras.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/cmake/ament_cmake_export_libraries-extras.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/cmake/cartesian_controller_baseConfig.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/cmake/cartesian_controller_baseConfig-version.cmake
+-- Symlinking: /home/fabio_tdt/Documents/ros2_dataset_ws/install/cartesian_controller_base/share/cartesian_controller_base/package.xml

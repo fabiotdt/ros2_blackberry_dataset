@@ -4,3 +4,6 @@ source;share/ur_simulator/hook/pythonpath.sh
 source;share/ur_simulator/hook/ament_prefix_path.ps1
 source;share/ur_simulator/hook/ament_prefix_path.dsv
 source;share/ur_simulator/hook/ament_prefix_path.sh
+source;../../build/ur_simulator/share/ur_simulator/hook/pythonpath_develop.ps1
+source;../../build/ur_simulator/share/ur_simulator/hook/pythonpath_develop.dsv
+source;../../build/ur_simulator/share/ur_simulator/hook/pythonpath_develop.sh

@@ -1,0 +1,1 @@
+ament_cmake_symlink_install_targets("TARGET_FILES" "/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/cartesian_compliance_controller/libcartesian_compliance_controller.so" "TARGETS" "cartesian_compliance_controller" "LIBRARY_DESTINATION" "lib" "ARCHIVE_DESTINATION" "lib" "RUNTIME_DESTINATION" "bin")

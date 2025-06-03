@@ -1,0 +1,20 @@
+[2.673s] Invoking command in '/home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/install/ur5e_motion_controller/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller/build --no-deps install_data
+[3.022s] running develop
+[3.022s] /usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+[3.023s]   warnings.warn(
+[3.024s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[3.024s]   warnings.warn(
+[3.350s] running egg_info
+[3.352s] writing ur5e_motion_controller.egg-info/PKG-INFO
+[3.352s] writing dependency_links to ur5e_motion_controller.egg-info/dependency_links.txt
+[3.352s] writing entry points to ur5e_motion_controller.egg-info/entry_points.txt
+[3.352s] writing requirements to ur5e_motion_controller.egg-info/requires.txt
+[3.352s] writing top-level names to ur5e_motion_controller.egg-info/top_level.txt
+[3.356s] reading manifest file 'ur5e_motion_controller.egg-info/SOURCES.txt'
+[3.356s] writing manifest file 'ur5e_motion_controller.egg-info/SOURCES.txt'
+[3.399s] running build_ext
+[3.400s] Creating /home/fabio_tdt/Documents/ros2_dataset_ws/install/ur5e_motion_controller/lib/python3.10/site-packages/ur5e-motion-controller.egg-link (link to .)
+[3.400s] 
+[3.400s] Installed /home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller
+[3.400s] running install_data
+[3.695s] Invoked command in '/home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller' returned '0': PYTHONPATH=/home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller/prefix_override:/home/fabio_tdt/Documents/ros2_dataset_ws/install/ur5e_motion_controller/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/fabio_tdt/Documents/ros2_dataset_ws/build/ur5e_motion_controller/build --no-deps install_data
