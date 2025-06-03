@@ -7,6 +7,7 @@ from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge
 from std_msgs.msg import Bool, Float64MultiArray, String
 import re
+import numpy as np
 
 
 from .berry_dataset import BerryDataset
@@ -33,12 +34,24 @@ class BerrySaver(Node):
 
         self.trigger_sub = self.create_subscription(Bool, '/ur_trigger', self.trigger_callback, 10)
         self.arm_T_sub = self.create_subscription(Float64MultiArray, '/ur_arm_T_matrix', self.arm_matrix_callback, 10)
+        
+        self.R_ac = np.array([[1,0,0],
+                             [0,0,1],
+                             [0,1,0]]) # Rotation matrix of the arm frame with respect to the camera frame
+        
+        self.p_ac = np.array([100,200,300]) # Translation vector of the camera frame relative to the arm frame in mm
+
+        self.T_ac = np.eye(4)
+        self.T_ac[:3, :3] = self.R_ac
+        self.T_ac[:3, 3] = self.p_ac
 
         #self.timer = self.create_timer(2.0, self.save_data)
+    
+    def rototranslate(self, T_ba): # T matrix of berry with respect to the arm frame
+        
+        T_bc = self.T_ac.dot(T_ba)  # Transform from arm frame to camera frame
+        return T_bc
 
-    def transform_frame(self, T):
-        # TODO: transform reference frame: from arm base frame to camera frame
-        pass
 
     def color_callback(self, msg: Image):
         self.color_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -67,9 +80,12 @@ class BerrySaver(Node):
             self.dataset.save_image(self.color_image)
             self.dataset.save_depth_image(self.depth_image)
             self.dataset.save_pointcloud(pcd)
+            
+            T_ba = np.array(self.arm_T).reshape(4, 4)
+            T_bc = self.rototranslate(T_ba)
 
-            arm_T_str = str(self.arm_T)
-            self.dataset.save_data(arm_T_str, arm_T_str, self.depin_intrin)
+            arm_T_str = str(T_bc)
+            self.dataset.save_data(arm_T_str, arm_T_str, self.depin_intrin) # I have two arm_T_str because I have arm pose and berry pose, later I will differenciate them
             self.get_logger().info(f"Saved berry dataset ID {self.dataset.idx}")
             self.dataset.idx += 1
 
