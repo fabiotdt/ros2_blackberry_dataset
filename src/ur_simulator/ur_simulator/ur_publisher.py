@@ -12,7 +12,6 @@ class URSimulator(Node):
         self.trigger_pub = self.create_publisher(Bool, '/ur_trigger', 10)
         self.matrix_pub = self.create_publisher(Float64MultiArray, '/ur_arm_T_matrix', 10)
         self._shutdown_requested = False
-        self._paused = True
 
         self.thread = threading.Thread(target=self.keyboard_loop)
         self.thread.daemon = True
