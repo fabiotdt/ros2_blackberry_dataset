@@ -11,7 +11,7 @@ from cartesian_controller_msgs.action import FollowCartesianTrajectory
 from cartesian_controller_msgs.msg import CartesianTrajectory, CartesianTrajectoryPoint
 from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation as R
-from robotics_toolbox.tools.trajectory import ctraj
+from roboticstoolbox.tools.trajectory import ctraj
 
 class MotionDataLoop(Node):
     
