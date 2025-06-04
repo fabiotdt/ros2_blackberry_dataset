@@ -1,19 +1,17 @@
-
 import rclpy
 from rclpy.node import Node
 import numpy as np
-from rclpy.action import ActionClient
 from std_msgs.msg import Bool, Float64MultiArray
 import threading
 import sys, select, termios, tty
 import time
 
+#https://github.com/Hydran00/Ultrasound-Setup/tree/main_noft
 # Cartesian controller
 # --> https://github.com/fzi-forschungszentrum-informatik/cartesian_controllers
-# Cartesian messanger
-# --> https://github.com/fzi-forschungszentrum-informatik/fzi_robot_interface_proposal
-from cartesian_control_msgs.action import FollowCartesianTrajectory
-from cartesian_control_msgs.msg import CartesianTrajectory, CartesianTrajectoryPoint
+# Universal Robots drivers
+# --> https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver
+
 from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation as R
 from roboticstoolbox.tools.trajectory import ctraj
@@ -23,7 +21,8 @@ class MotionDataLoop(Node):
     
     def __init__(self):
         super().__init__('motion_and_dataset_loop')
-        self.client = ActionClient(self, FollowCartesianTrajectory, '/cartesian_motion_controller/follow_cartesian_trajectory')
+        # Create a publisher for the Cartesian motion controller
+        self.pose_pub = self.create_publisher(PoseStamped, '/cartesian_motion_controller/cartesian_command', 10)
 
         # Trigger the dataset_saver
         self.trigger_pub = self.create_publisher(Bool, '/ur_trigger', 10)
@@ -73,57 +72,44 @@ class MotionDataLoop(Node):
         if self._paused or self.in_progress:
             return
         
-        if not self.client.wait_for_server(timeout_sec=1.0):
-            self.get_logger().warn("Action server not available yet.")
-            return
-
         self.in_progress = True
         self.get_logger().info("Starting new motion-data cycle")
         self.send_random_trajectory()
 
     def send_random_trajectory(self):
+        
         T1 = np.eye(4)
         self.T2 = T1.copy()
         self.T2[:3, 3] = np.random.uniform([0.4, -0.2, 0.4], [0.6, 0.2, 0.6]) # Changhe the range of searchspace accroding to the arm span
 
         self.get_logger().info(f"Next random target:\n{self.T2}")
 
-        Ts = ctraj(T1, self.T2, 20)
+        self.Ts = ctraj(T1, self.T2, 20)
+        self.trajectory_index = 0
+        self.trajectory_timer = self.create_timer(0.1, self.publish_next_pose) 
 
-        traj = CartesianTrajectory()
-        traj.header.frame_id = 'base_link'
-
-        for T in Ts:
-            point = CartesianTrajectoryPoint()
-            pose = PoseStamped()
-            pose.pose.position.x, pose.pose.position.y, pose.pose.position.z = T[:3, 3]
-            q = R.from_matrix(T[:3, :3]).as_quat()
-            pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w = q
-            point.pose = pose.pose
-            traj.points.append(point)
-
-        goal = FollowCartesianTrajectory.Goal()
-        goal.trajectory = traj
-
-        self.client.send_goal_async(goal).add_done_callback(self.goal_sent)
-
-    def goal_sent(self, future):
-        goal_handle = future.result()
-        if not goal_handle.accepted:
-            self.get_logger().error("Goal rejected")
-            self.in_progress = False
+    def publish_next_pose(self):
+        if self.trajectory_index >= len(self.Ts):
+            self.trajectory_timer.cancel()
+            self.motion_done()
             return
-        self.get_logger().info("Goal accepted")
-        goal_handle.get_result_async().add_done_callback(self.motion_done)
 
-    def motion_done(self, future):
-        
-        result = future.result()
-        if result.result.error_code != 0:
-            self.get_logger().warn(f"Motion failed with code: {result.result.error_code}")
-        else:
-            self.get_logger().info("Motion completed successfully.")
-            
+        T = self.Ts[self.trajectory_index]
+        pose_msg = PoseStamped()
+        pose_msg.header.frame_id = 'base_link'
+        pose_msg.header.stamp = self.get_clock().now().to_msg()
+
+        pose_msg.pose.position.x, pose_msg.pose.position.y, pose_msg.pose.position.z = T[:3, 3]
+        q = R.from_matrix(T[:3, :3]).as_quat()
+        pose_msg.pose.orientation.x, pose_msg.pose.orientation.y, pose_msg.pose.orientation.z, pose_msg.pose.orientation.w = q
+
+        self.pose_pub.publish(pose_msg)
+        self.trajectory_index += 1
+
+    def motion_done(self):
+
+        self.get_logger().info("Motion completed.")   
+
         trigger_msg = Bool()
         trigger_msg.data = True
         self.trigger_pub.publish(trigger_msg)
