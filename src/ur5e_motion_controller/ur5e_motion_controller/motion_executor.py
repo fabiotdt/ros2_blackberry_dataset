@@ -8,28 +8,18 @@ import threading
 import sys, select, termios, tty
 import time
 
-from cartesian_controller_msgs.action import FollowCartesianTrajectory
-from cartesian_controller_msgs.msg import CartesianTrajectory, CartesianTrajectoryPoint
+# --> https://github.com/fzi-forschungszentrum-informatik/fzi_robot_interface_proposal
+from cartesian_control_msgs.action import FollowCartesianTrajectory
+from cartesian_control_msgs.msg import CartesianTrajectory, CartesianTrajectoryPoint
 from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation as R
 from roboticstoolbox.tools.trajectory import ctraj
-import os
-from urdfpy import URDF
-from roboticstoolbox import ERobot
+
 
 class MotionDataLoop(Node):
     
     def __init__(self):
         super().__init__('motion_and_dataset_loop')
-
-        # Load the URDF file for your robotic arm
-        urdf_path = '..\resource\ur5e.urdf'  # Update this path to your URDF file
-        robot_urdf = URDF.load(urdf_path)
-
-        # Convert URDF to a Robotics Toolbox ERobot for kinematics
-        robot = ERobot.URDF(urdf_path)
-        self.get_logger().info(f"Loaded robot: {robot.name}")
-
         self.client = ActionClient(self, FollowCartesianTrajectory, '/cartesian_motion_controller/follow_cartesian_trajectory')
 
         # Trigger the dataset_saver
