@@ -8,6 +8,9 @@ import threading
 import sys, select, termios, tty
 import time
 
+# Cartesian controller
+# --> https://github.com/fzi-forschungszentrum-informatik/cartesian_controllers
+# Cartesian messanger
 # --> https://github.com/fzi-forschungszentrum-informatik/fzi_robot_interface_proposal
 from cartesian_control_msgs.action import FollowCartesianTrajectory
 from cartesian_control_msgs.msg import CartesianTrajectory, CartesianTrajectoryPoint
