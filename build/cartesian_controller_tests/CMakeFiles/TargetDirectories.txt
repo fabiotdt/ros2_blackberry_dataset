@@ -1,9 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/uninstall.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/cartesian_controller_tests_uninstall.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/test.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/edit_cache.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/rebuild_cache.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/list_install_components.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/install.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/install/local.dir
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_tests/CMakeFiles/install/strip.dir

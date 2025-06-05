@@ -1,1 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/src/cartesian_controllers/cartesian_motion_controller/include/cartesian_motion_controller/cartesian_motion_controller.h

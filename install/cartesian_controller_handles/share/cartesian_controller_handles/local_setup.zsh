@@ -1,1 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_handles/ament_cmake_environment_hooks/local_setup.zsh

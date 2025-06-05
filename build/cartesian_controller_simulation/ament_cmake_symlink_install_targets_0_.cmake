@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_simulation/libcartesian_controller_simulation.so" "/home/fabio_tdt/Documents/ros2_dataset_ws/build/cartesian_controller_simulation/libmujoco_simulator.so" "TARGETS" "cartesian_controller_simulation" "mujoco_simulator" "DESTINATION" "lib")

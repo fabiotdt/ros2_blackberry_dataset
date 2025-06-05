@@ -1,4 +1,0 @@
-[console_scripts]
-berry_dataset = berry_dataset.berry_dataset:main
-dataset_saver = berry_dataset.dataset_saver:main
-

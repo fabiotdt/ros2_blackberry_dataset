@@ -1,1 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/src/ur_simulation_gz/ur_simulation_gz/launch/ur_sim_moveit.launch.py
