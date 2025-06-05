@@ -11,6 +11,7 @@ import time
 # --> https://github.com/fzi-forschungszentrum-informatik/cartesian_controllers
 # Universal Robots drivers
 # --> https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver
+# --> https://github.com/UniversalRobots/Universal_Robots_ROS2_GZ_Simulation
 
 from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation as R

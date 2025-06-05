@@ -1,0 +1,16 @@
+# Ignore build, install, and log folders
+build/
+install/
+log/
+
+**/build/
+**/install/
+**/log/
+
+*.zsh
+*.sh
+#vscode
+.vscode
+.vscode/*
+__pycache__
+__pycache__/*
