@@ -1,1 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/src/launch_package/setup.py

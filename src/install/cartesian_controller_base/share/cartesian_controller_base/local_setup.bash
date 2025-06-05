@@ -1,1 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/src/build/cartesian_controller_base/ament_cmake_environment_hooks/local_setup.bash

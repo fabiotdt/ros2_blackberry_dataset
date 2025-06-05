@@ -1,1 +1,0 @@
-/home/fabio_tdt/Documents/ros2_dataset_ws/src/cartesian_controllers/cartesian_controller_simulation/launch/simulation.launch.py

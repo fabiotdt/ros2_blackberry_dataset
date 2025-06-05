@@ -1,4 +1,0 @@
-[33mCMake Warning at CMakeLists.txt:27 (message):
-  MUJOCO_DIR not specified.  Using default /home/fabio_tdt/mujoco-3.0.0
-
-[0m

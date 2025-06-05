@@ -1,3 +1,0 @@
-[console_scripts]
-RealSenseStreamer = realsense_streamer.RealSenseStreamer:main
-
