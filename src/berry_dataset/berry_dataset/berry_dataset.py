@@ -33,7 +33,7 @@ class BerryDataset:
         if self.dataset_name in os.listdir():
             self.dataset = pd.read_csv(os.path.join(self.base_root, self.dataset_name))
             self.idx = self.dataset['berry_id'].max() + 1 if not self.dataset.empty else 0
-            
+                    
         else: # If the dataset does not exist: create it
             columns = ['arm_T_matrix',    # T matrix of the last joint of the arm
                         'berry_T_matrix', # T matrix of the tip of the blackberry
@@ -57,6 +57,7 @@ class BerryDataset:
         self.save_dataset()
 
     def save_dataset(self):
+        # Save the dataset to a CSV file
         save_path = os.path.join(self.base_root, self.dataset_name)
         self.dataset.to_csv(save_path, index=False)
 

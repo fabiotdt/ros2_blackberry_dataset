@@ -66,7 +66,7 @@ class BerrySaver(Node):
         self.get_logger().info(f"Received trigger: {msg.data}")
 
         self.trigger = msg.data
-        if self.trigger:
+        if self.trigger and self.arm_T is not None:
             self.save_data()
 
     def arm_matrix_callback(self, msg):
@@ -81,6 +81,7 @@ class BerrySaver(Node):
             self.dataset.save_depth_image(self.depth_image)
             self.dataset.save_pointcloud(pcd)
             
+            print(f'self.arm_T ----------------------------> : {self.arm_T}')
             T_ba = np.array(self.arm_T).reshape(4, 4)
             T_bc = self.rototranslate(T_ba)
 
