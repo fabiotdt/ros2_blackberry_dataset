@@ -11,7 +11,7 @@ import os
 def generate_launch_description():
     ur_description_pkg = get_package_share_directory('ur_description')
     motion_controller_pkg = get_package_share_directory('ur5e_motion_controller')
-    ur_simulation_pkg = get_package_share_directory('us_simulation_gz')
+    ur_simulation_pkg = get_package_share_directory('ur_simulation_gz')
 
     return LaunchDescription([
 
@@ -23,22 +23,13 @@ def generate_launch_description():
         DeclareLaunchArgument('run_motion', default_value='false',
                               description='Run the UR trigger node'),
 
-        # Launch UR5e model + RViz --> static
-         #IncludeLaunchDescription(
-         #   PythonLaunchDescriptionSource(
-         #       os.path.join(ur_description_pkg, 'launch', 'view_ur.launch.py')
-         #   ),
-         #   launch_arguments={'ur_type': 'ur5e'}.items()
-         #),
 
         IncludeLaunchDescription(
            PythonLaunchDescriptionSource(
-               os.path.join(ur_simulation_pkg, 'launch', 'bringup.launch.py')
+               os.path.join(ur_description_pkg, 'launch', 'ur_sim_control.launch.py')
            ),
-           launch_arguments={'ur_type': 'ur5e',
-                             'safety_limits' : 'false'}.items()
+           launch_arguments={'ur_type': 'ur5e'}.items()
         ),
-
 
 
         # State publisher node (your own)

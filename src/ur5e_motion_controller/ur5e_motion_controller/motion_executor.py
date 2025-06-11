@@ -80,14 +80,27 @@ class MotionDataLoop(Node):
         self.send_random_trajectory()
 
     def send_random_trajectory(self):
-        
-        #T1 = np.eye(4)
-        #self.T2 = T1.copy()
+
+        # Define your workspace bounds (example values)
+        xmin, xmax = 0.0, 0.5    # change according to the arm orientation
+        ymin, ymax = -0.5, 0.5   # change according to the arm orientation
+        zmin, zmax = 0.2, 0.7
+
         T1 = SE3(np.eye(4))
         self.T2 = np.eye(4)
 
-        self.T2[:3, 3] = np.random.uniform([0.4, -0.2, 0.4], [0.6, 0.2, 0.6]) # Changhe the range of searchspace accroding to the arm span
-    
+        # Generate random euler angles RPY
+        rpy = np.random.uniform(-np.pi, np.pi, 3)  # Random roll, pitch, yaw
+        rotmat = R.from_euler('xyz', rpy).as_matrix()  # Convert to rotation matrix
+        
+        self.T2[:3, :3] = rotmat  # Set the rotation part
+
+        # Set the translation part to random values within the defined workspace
+        pos_x = np.random.uniform(xmin, xmax)
+        pos_y = np.random.uniform(ymin, ymax)
+        pos_z = np.random.uniform(zmin, zmax)
+        self.T2[:3, 3] = [pos_x, pos_y, pos_z] 
+
         self.get_logger().info(f"Next random target:\n{self.T2}")
 
         self.Ts = ctraj(T1, SE3(self.T2), 20)
