@@ -24,13 +24,19 @@ def generate_launch_description():
                               description='Run the UR trigger node'),
 
 
-        IncludeLaunchDescription(
-           PythonLaunchDescriptionSource(
-               os.path.join(ur_description_pkg, 'launch', 'ur_sim_control.launch.py')
-           ),
-           launch_arguments={'ur_type': 'ur5e'}.items()
-        ),
+        # To include the simulation
+        # IncludeLaunchDescription(
+        #    PythonLaunchDescriptionSource(
+        #        os.path.join(ur_description_pkg, 'launch', 'ur_sim_control.launch.py')
+        #    ),
+        #    launch_arguments={'ur_type': 'ur5e'}.items()
+        # ),
 
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(motion_controller_pkg, 'launch', 'ur5e.launch.py')
+            )
+        ),
 
         # State publisher node (your own)
         Node(

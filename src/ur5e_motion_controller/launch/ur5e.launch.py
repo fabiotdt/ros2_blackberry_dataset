@@ -156,7 +156,7 @@ def launch_setup(context, *args, **kwargs):
     robot_description = {"robot_description": robot_description_content}
 
     initial_joint_controllers = PathJoinSubstitution(
-        [FindPackageShare(runtime_config_package), "config", ur_type, controllers_file]
+        [FindPackageShare("ur5e_motion_controller"), "config", controllers_file]
     )
 
     rviz_config_file = PathJoinSubstitution(
@@ -193,19 +193,19 @@ def launch_setup(context, *args, **kwargs):
             ParameterFile(initial_joint_controllers, allow_substs=True),
         ],
         output="screen",
-        # condition=UnlessCondition(use_fake_hardware),
-        #         remappings=[
-        #     ('motion_control_handle/target_frame', 'target_frame'),
-        #     ('cartesian_motion_controller/target_frame', 'target_frame'),
-        #     ('cartesian_compliance_controller/target_frame', 'target_frame'),
-        #     ('cartesian_compliance_controller/target_wrench', 'target_wrench'),
-        #     # ('cartesian_compliance_controller/ft_sensor_wrench', 'bus0/ft_sensor0/ft_sensor_readings/wrench'),
-        #     ('cartesian_compliance_controller/ft_sensor_wrench', '/force_torque_sensor_broadcaster/wrench'),
-        #     ('cartesian_adaptive_compliance_controller/target_frame', 'target_frame'),
-        #     ('cartesian_adaptive_compliance_controller/target_wrench', 'target_wrench'),
-        #     # ('cartesian_adaptive_compliance_controller/ft_sensor_wrench', 'bus0/ft_sensor0/ft_sensor_readings/wrench'),
-        #     ('cartesian_adaptive_compliance_controller/ft_sensor_wrench', '/force_torque_sensor_broadcaster/wrench'),
-        # ]
+        condition=UnlessCondition(use_fake_hardware),
+                remappings=[
+            ('motion_control_handle/target_frame', 'target_frame'),
+            ('cartesian_motion_controller/target_frame', 'target_frame'),
+            ('cartesian_compliance_controller/target_frame', 'target_frame'),
+            ('cartesian_compliance_controller/target_wrench', 'target_wrench'),
+            # ('cartesian_compliance_controller/ft_sensor_wrench', 'bus0/ft_sensor0/ft_sensor_readings/wrench'),
+            ('cartesian_compliance_controller/ft_sensor_wrench', '/force_torque_sensor_broadcaster/wrench'),
+            ('cartesian_adaptive_compliance_controller/target_frame', 'target_frame'),
+            ('cartesian_adaptive_compliance_controller/target_wrench', 'target_wrench'),
+            # ('cartesian_adaptive_compliance_controller/ft_sensor_wrench', 'bus0/ft_sensor0/ft_sensor_readings/wrench'),
+            ('cartesian_adaptive_compliance_controller/ft_sensor_wrench', '/force_torque_sensor_broadcaster/wrench'),
+        ]
     )
 
     #LOADING CONTROLLERS
@@ -229,7 +229,7 @@ def launch_setup(context, *args, **kwargs):
     cartesian_motion_controller_spawner = Node(
         package="controller_manager",
         executable=spawner,
-        arguments=["cartesian_motion_controller", "--inactive", "-c", "/controller_manager"],
+        arguments=["cartesian_motion_controller", "-c", "/controller_manager"],
     )
     motion_control_handle_spawner = Node(
         package="controller_manager",
@@ -361,8 +361,20 @@ def launch_setup(context, *args, **kwargs):
         condition=UnlessCondition(activate_joint_controller),
     )
 
+    static_transform_publisher = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="ground_publisher",
+        arguments=[
+            "0.0", "0.0", "1.79", "3.14", "0.0", "3.14",  # x, y, z, roll, pitch, yaw
+            tf_prefix.perform(context) + "world",  # parent frame
+            tf_prefix.perform(context) + "base_link",  # child frame
+        ],
+        output="screen",
+    )
     # os.system(" ros2 service call /bus0/ft_sensor0/reset_wrench rokubimini_msgs/srv/ResetWrench \"desired_wrench:  force: x: 0.0 y: 0.0 z: 0.0 torque: x: 0.0 y: 0.0 z: 0.0\" ")
     nodes_to_start = [
+        
         control_node,
         ur_control_node,
         dashboard_client_node,
@@ -379,7 +391,7 @@ def launch_setup(context, *args, **kwargs):
         # cartesian_adaptive_compliance_controller_spawner,
         # cartesian_force_controller_spawner,
         cartesian_motion_controller_spawner,
-    ] + controller_spawners
+    ] + controller_spawners + [static_transform_publisher]
 
     return nodes_to_start
 
