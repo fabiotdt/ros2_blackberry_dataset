@@ -1,6 +1,7 @@
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterFile
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
@@ -64,12 +65,25 @@ def launch_setup(context, *args, **kwargs):
         [FindPackageShare("ur_robot_driver"), "resources", "rtde_output_recipe.txt"]
     )
 
+        # Path to my XACRO file
+    xacro_file = PathJoinSubstitution([
+        FindPackageShare("ur5e_motion_controller"),
+        "my_urdf",
+        LaunchConfiguration("description_file")
+    ])
+
+
     robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
+        [   
+
+            # PathJoinSubstitution([FindExecutable(name="xacro")]),
+            # " ",
+            FindExecutable(name="xacro"),
             " ",
-            PathJoinSubstitution([FindPackageShare(description_package), "urdf", description_file]),
+            xacro_file, # Path for my custom XACRO file
             " ",
+            # PathJoinSubstitution([FindPackageShare(description_package), "urdf", description_file]),
+            # " ",
             "robot_ip:=",
             robot_ip,
             " ",
@@ -153,7 +167,11 @@ def launch_setup(context, *args, **kwargs):
             " ",
         ]
     )
-    robot_description = {"robot_description": robot_description_content}
+    
+    #robot_description = {"robot_description": robot_description_content}
+
+    robot_description = {"robot_description": ParameterValue(robot_description_content, value_type=str)
+}
 
     initial_joint_controllers = PathJoinSubstitution(
         [FindPackageShare("ur5e_motion_controller"), "config", controllers_file]
@@ -221,11 +239,13 @@ def launch_setup(context, *args, **kwargs):
         executable=spawner,
         arguments=["cartesian_adaptive_compliance_controller","-c", "/controller_manager"],
     )
+    
     # cartesian_force_controller_spawner = Node(
     #     package="controller_manager",
     #     executable=spawner,
     #     arguments=["cartesian_force_controller", "--stopped", "-c", "/controller_manager"],
     # )
+    
     cartesian_motion_controller_spawner = Node(
         package="controller_manager",
         executable=spawner,
@@ -361,6 +381,7 @@ def launch_setup(context, *args, **kwargs):
         condition=UnlessCondition(activate_joint_controller),
     )
 
+    # Set the world frame to be the base_link frame
     static_transform_publisher = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
@@ -458,13 +479,25 @@ def generate_launch_description():
         is not set, it enables use of a custom description.",
         )
     )
+
+    # declared_arguments.append(
+    #     DeclareLaunchArgument(
+    #         "description_file",
+    #         default_value="ur.urdf.xacro",
+    #         description="URDF/XACRO description file with the robot.",
+    #     )
+    # )
+
+    # Load my_ur5e_robot.xacro where I have specified the custom balckberry atachment
     declared_arguments.append(
         DeclareLaunchArgument(
             "description_file",
-            default_value="ur.urdf.xacro",
-            description="URDF/XACRO description file with the robot.",
+            default_value="my_ur5e_robot.xacro",
+            description="URDF/XACRO description of the robot with a custom end-effector",
         )
     )
+
+
     declared_arguments.append(
         DeclareLaunchArgument(
             "tf_prefix",

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5e_with_berry">
+
+  <xacro:macro name="add_blackberry" params="">
+    <!-- Define blackberry link -->
+    <!-- Gray: 0.2 0.2 0.2 1 -->
+    <!-- Red: 1 0 0 1 -->
+    <link name="blackberry">
+        <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <mesh filename="file://$(find ur5e_motion_controller)/meshes/fake_berry.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="">
+            <color rgba="1.0 0.0. 0.0 1.0 "/> 
+        </material>
+        </visual>
+    </link>
+
+    <joint name="fake_berry" type="fixed">
+        <parent link="tool0"/>
+        <child link="blackberry"/>
+        <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    </joint>
+
+      </xacro:macro>
+</robot>
