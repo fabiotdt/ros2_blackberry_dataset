@@ -102,7 +102,11 @@ class RealSenseStreamer(Node):
         self.depin_pub.publish(camera_info_msg)
 
         if self.display:
-            cv2.imshow("RealSense Color Stream", color_image)
+
+            resized_image = cv2.resize(color_image, (0, 0), fx=0.5, fy=0.5)
+            cv2.imshow("RealSense Color Stream", resized_image)
+            
+            #cv2.imshow("RealSense Color Stream", color_image)
             key = cv2.waitKey(1)
             if key == 27:  # ESC to quit
                 self.stop_stream()

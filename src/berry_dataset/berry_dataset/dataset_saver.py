@@ -8,7 +8,9 @@ from cv_bridge import CvBridge
 from std_msgs.msg import Bool, Float64MultiArray, String
 import re
 import numpy as np
-
+from geometry_msgs.msg import PoseStamped
+from spatialmath import SE3
+from scipy.spatial.transform import Rotation as R
 
 from .berry_dataset import BerryDataset
 from .utils import CreatePointCloud
@@ -33,8 +35,10 @@ class BerrySaver(Node):
         self.trigger = False
 
         self.trigger_sub = self.create_subscription(Bool, '/ur_trigger', self.trigger_callback, 10)
-        self.arm_T_sub = self.create_subscription(Float64MultiArray, '/ur_arm_T_matrix', self.arm_matrix_callback, 10)
+        #self.arm_T_sub = self.create_subscription(Float64MultiArray, '/ur_arm_T_matrix', self.arm_matrix_callback, 10)
+        self.arm_T_sub = self.create_subscription(PoseStamped, '/berry_pose', self.current_pose_callback, 10)
         
+        # TODO: change this with the calibration matrix!
         self.R_ac = np.array([[1,0,0],
                              [0,0,1],
                              [0,1,0]]) # Rotation matrix of the arm frame with respect to the camera frame
@@ -44,14 +48,23 @@ class BerrySaver(Node):
         self.T_ac = np.eye(4)
         self.T_ac[:3, :3] = self.R_ac
         self.T_ac[:3, 3] = self.p_ac
-
-        #self.timer = self.create_timer(2.0, self.save_data)
     
     def rototranslate(self, T_ba): # T matrix of berry with respect to the arm frame
         
         T_bc = self.T_ac.dot(T_ba)  # Transform from arm frame to camera frame
         return T_bc
-
+    
+    def current_pose_callback(self, msg):
+        # Store current pose as SE3 for use in ctraj
+        # self.get_logger().info("Received current pose.")
+        pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
+        ori = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
+        rot = R.from_quat(ori).as_matrix()
+        T = np.eye(4)
+        T[:3, :3] = rot
+        T[:3, 3] = pos
+        
+        self.arm_T = T
 
     def color_callback(self, msg: Image):
         self.color_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -69,9 +82,6 @@ class BerrySaver(Node):
         if self.trigger and self.arm_T is not None:
             self.save_data()
 
-    def arm_matrix_callback(self, msg):
-        self.arm_T = msg.data 
-
     def save_data(self):
         if self.color_image is not None and self.depth_image is not None and self.depin_intrin is not None:
 
@@ -81,7 +91,7 @@ class BerrySaver(Node):
             self.dataset.save_depth_image(self.depth_image)
             self.dataset.save_pointcloud(pcd)
             
-            print(f'self.arm_T ----------------------------> : {self.arm_T}')
+            self.get_logger().info(f"Next random target:\n{self.arm_T}")
             T_ba = np.array(self.arm_T).reshape(4, 4)
             T_bc = self.rototranslate(T_ba)
 

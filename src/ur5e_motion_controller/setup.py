@@ -29,6 +29,7 @@ setup(
         'console_scripts': [
             'motion_executor = ur5e_motion_controller.motion_executor:main',
             'arm_state_publisher = ur5e_motion_controller.arm_state_publisher:main',
+            'berry_pose_publisher = ur5e_motion_controller.berry_pose_publisher:main',
         ],
     },
 )

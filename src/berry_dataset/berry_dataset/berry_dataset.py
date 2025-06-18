@@ -30,7 +30,7 @@ class BerryDataset:
         os.makedirs(self.depth_IMG_dir, exist_ok=True)
         
         # Check if the dataset does exist or not
-        if self.dataset_name in os.listdir():
+        if self.dataset_name in os.listdir(self.base_root):
             self.dataset = pd.read_csv(os.path.join(self.base_root, self.dataset_name))
             self.idx = self.dataset['berry_id'].max() + 1 if not self.dataset.empty else 0
                     

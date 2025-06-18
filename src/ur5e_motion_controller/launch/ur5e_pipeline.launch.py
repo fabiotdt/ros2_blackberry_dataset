@@ -37,6 +37,12 @@ def generate_launch_description():
                 os.path.join(motion_controller_pkg, 'launch', 'ur5e.launch.py')
             )
         ),
+        Node(
+            package='ur5e_motion_controller',
+            executable='berry_pose_publisher',
+            name='berry_pose_publisher',
+            output='screen',
+        ),
 
         # State publisher node (your own)
         Node(
