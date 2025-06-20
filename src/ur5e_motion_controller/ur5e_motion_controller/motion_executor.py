@@ -36,13 +36,9 @@ class MotionDataLoop(Node):
         # Create a subscriber to get the current pose of the arm
         self.current_pose = None
         self.create_subscription(PoseStamped, '/berry_pose', self.current_pose_callback, 10)
-        # Create a subscriber to get the arm state
-        """self.create_subscription(Bool, '/arm_state_reached', self.state_reached_callback, 10)
-        self.waiting_for_state = False"""
 
         # Trigger the dataset_saver
         self.trigger_pub = self.create_publisher(Bool, '/ur_trigger', 10)
-        self.matrix_pub = self.create_publisher(Float64MultiArray, '/ur_arm_T_matrix', 10) # Maybe don't need this --> the dataset_saver can get the target pose from the //berry_pose topic
 
         self._shutdown_requested = False
         self._paused = True
@@ -60,8 +56,8 @@ class MotionDataLoop(Node):
         self.position_index = 0
         self.trajectory_index = 0
         self.Ts = []
-        self.point_idx = 0        
-
+        self.point_idx = 0 
+    
     def current_pose_callback(self, msg):
         # Store current pose as SE3 for use in ctraj
         # self.get_logger().info("Received current pose.")
@@ -100,6 +96,12 @@ class MotionDataLoop(Node):
                         break
         except termios.error:
             print("Keyboard input not available. Run this node in a terminal.")
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt received in keyboard_loop.")
+            self._shutdown_requested = True
+        except Exception as e:
+            print(f"Unhandled exception in keyboard_loop: {e}")
+            self._shutdown_requested = True
         finally:
             try:
                 termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
@@ -112,15 +114,17 @@ class MotionDataLoop(Node):
         
         self.in_progress = True
         self.get_logger().info("Starting new motion-data cycle")
-        self.create_random_grid()
-        self.send_random_trajectory()
+        
+        self.create_random_grid()       # Create the grid of points in the workspace
+        self.create_random_pose()       # Create the random poses with different rotations
+        self.send_random_trajectory()   # Send the first trajectory to the arm
     
     def create_random_grid(self):
         
         # Define your workspace bounds in mm
-        ymin, ymax = 0.400, 0.650    # change according to the arm orientation
-        xmin, xmax = -0.450, 0.450     # change according to the arm orientation
-        zmin, zmax = 0.010, 0.600
+        ymin, ymax = 0.350, 0.550    
+        xmin, xmax = -0.350, 0.350     
+        zmin, zmax = 0.100, 0.500
 
         spacing = 0.10  # 10 cm
 
@@ -130,43 +134,27 @@ class MotionDataLoop(Node):
         z_vals = np.arange(zmin, zmax + spacing, spacing)
 
         # Create a 3D grid of points
-        self.X, self.Y, self.Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij')  # shape: (len(x_vals), len(y_vals), len(z_vals))
+        self.X, self.Y, self.Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij') # shape: (len(x_vals), len(y_vals), len(z_vals))
 
-    """def create_random_rotation(self):
+
+    def create_random_pose(self):
+
+        # Discretize roll and pitch with 8 different rotations, (-45 deg, 0, 45),(-45 deg, 0, 45)
+        roll_disc = [-45.0, 0.0, 45.0]
+        pitch_disc = [-45.0, 0.0, 45.0]
+
+        yaw = -90.0
+        # create meshgrid of all combinations
+        self.rotation_combinations = np.array(np.meshgrid(roll_disc, pitch_disc)).T.reshape(-1, 2)
         
-        rpy = np.random.uniform(-np.pi, np.pi, 3)  # Random roll, pitch, yaw
-        rotmat = R.from_euler('xyz', rpy).as_matrix()  # Convert to rotation matrix
-        return rotmat"""
-    
-    def create_pose_rotation(self, pose_index):
-
-        angle = np.pi / 4  # 45 degrees in radians
-
-        euler_angles_list = [
-            (0, 0, 0),                   # Center
-            (angle, 0, 0),               # Middle of side - X axis
-            (0, angle, 0),               # Middle of side - Y axis
-            (0, 0, angle),               # Middle of side - Z axis
-            (-angle, 0, 0),              # Middle of side - negative X axis
-            (angle, angle, angle),       # Corner 1
-            (-angle, angle, angle),      # Corner 2
-            (angle, -angle, angle),      # Corner 3
-            (angle, angle, -angle),      # Corner 4
-        ]
-
-        if pose_index < 0 or pose_index >= len(euler_angles_list):
-            raise ValueError("pose_index must be between 0 and 8 inclusive.")
-
-        rpy = euler_angles_list[pose_index]
-        rotmat = R.from_euler('xyz', rpy).as_matrix()
-                
-        rotmat = np.array([
-            [1, 0, 0],
-            [0, 0, 1],
-            [0, -1, 0]
-        ])      
+        self.rotation_combinations = np.hstack((
+            self.rotation_combinations[:, 0:1],                 # (N,1)
+            np.zeros((self.rotation_combinations.shape[0], 1)), # (N,1)
+            self.rotation_combinations[:, 1:2]                  # (N,1)
+        ))
         
-        return rotmat
+        self.rotation_combinations[:,0] += yaw  # Add yaw to the first column
+
 
     def send_random_trajectory(self):
 
@@ -178,23 +166,24 @@ class MotionDataLoop(Node):
         T1 = SE3(self.current_pose)
         self.T2 = np.eye(4)
 
-        self.T2[:3, :3] = self.create_pose_rotation(self.rotation_index)  # Set the rotation part
-        
+        self.T2[:3,:3] = R.from_euler('xyz', self.rotation_combinations[self.rotation_index % 9], degrees=True).as_matrix()  # Set the rotation part
         # Define the first rotation index
         self.rotation_index += 1
 
-        if self.rotation_index == 9:  # After 9 rotations, reset to 0
-            if self.position_index >= self.X.size - 1:
-                self.get_logger().info("Reached the end of the grid. Resetting position index.")
-
-            self.rotation_index = 0
+        if self.rotation_index == 9:
+            
+            self.rotation_index = 0  # Reset rotation index after 9 iterations
             self.position_index += 1
+
+            #if self.position_index >= self.X.size - 1:
+            if self.position_index == 1:
+                self.get_logger().info("Reached the end of the grid.")
+                return
+            
 
         self.T2[:3, 3] = [self.X.ravel()[self.position_index], 
                 self.Y.ravel()[self.position_index], 
                 self.Z.ravel()[self.position_index]]
-
-        self.get_logger().info(f"Next random target:\n{self.T2}")
 
         self.Ts = ctraj(T1, SE3(self.T2), 500 * 10)
 
@@ -202,11 +191,6 @@ class MotionDataLoop(Node):
 
     def publish_next_pose(self):
         
-        if self.trajectory_index >= len(self.Ts):
-            self.trajectory_timer.cancel()
-            # self.motion_done()
-            return
-
         T = self.Ts[self.trajectory_index]
         pose_msg = PoseStamped()
         pose_msg.header.frame_id = 'base_link' # base_link or 'world'
@@ -218,11 +202,19 @@ class MotionDataLoop(Node):
         pose_msg.pose.orientation.x, pose_msg.pose.orientation.y, pose_msg.pose.orientation.z, pose_msg.pose.orientation.w = q
 
         self.pose_pub.publish(pose_msg)
-        self.get_logger().info(f"Published pose {self.trajectory_index + 1}/{len(self.Ts)}: {pose_msg.pose.position.x}, {pose_msg.pose.position.y}, {pose_msg.pose.position.z}")
         
         if self.trajectory_index == len(self.Ts) - 1:
             self.goal_pub.publish(pose_msg)
             self.get_logger().info("Published final target goal pose.")
+            
+            time.sleep(2)
+
+            trigger_msg = Bool()
+            trigger_msg.data = True
+            self.trigger_pub.publish(trigger_msg)
+
+            time.sleep(4)
+
             self.trajectory_timer.cancel()
             return
 
@@ -235,20 +227,12 @@ class MotionDataLoop(Node):
         trigger_msg = Bool()
         trigger_msg.data = True
         self.trigger_pub.publish(trigger_msg)
-        
-        T_msg = Float64MultiArray()
-        T_msg.data = self.T2.flatten().tolist()
-        self.matrix_pub.publish(T_msg)
-        
-        # Call the resume loop after a delay of --> 3 seconds
-        self.get_logger().info("waiting.")
-        threading.Timer(3.0, self.resume_loop).start()
-
-    def resume_loop(self):
+       
+    def resume_loop(self): # If you would like to make it recursive
         self.get_logger().info("Ready for next motion-data cycle.")
         # Clear the cache and reset the trajectory index
         self.Ts.clear()
-        self.send_random_trajectory()
+        #self.send_random_trajectory()
         #self.in_progress = False
 
 def main(args=None):
@@ -258,10 +242,13 @@ def main(args=None):
     # try:
     while rclpy.ok() and not node._shutdown_requested:
         rclpy.spin_once(node)
-        if node.trajectory_index == len(node.Ts) - 1:
+        if node.trajectory_index == len(node.Ts) - 1: # TS is a list containing all the points in the trajectories
+            # Tell the arm that the motion is done
+            #node.motion_done()
+            # Wait 3 sec before sending the next trajectory
+            #time.sleep(3)
+            # Send the next trajectory
             node.send_random_trajectory()
-    # rclpy.spin(node)
-    # finally:
     node.destroy_node()
     rclpy.shutdown()
     

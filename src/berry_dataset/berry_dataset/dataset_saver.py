@@ -35,7 +35,6 @@ class BerrySaver(Node):
         self.trigger = False
 
         self.trigger_sub = self.create_subscription(Bool, '/ur_trigger', self.trigger_callback, 10)
-        #self.arm_T_sub = self.create_subscription(Float64MultiArray, '/ur_arm_T_matrix', self.arm_matrix_callback, 10)
         self.arm_T_sub = self.create_subscription(PoseStamped, '/berry_pose', self.current_pose_callback, 10)
         
         # TODO: change this with the calibration matrix!
@@ -56,7 +55,6 @@ class BerrySaver(Node):
     
     def current_pose_callback(self, msg):
         # Store current pose as SE3 for use in ctraj
-        # self.get_logger().info("Received current pose.")
         pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
         ori = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
         rot = R.from_quat(ori).as_matrix()
@@ -76,7 +74,6 @@ class BerrySaver(Node):
         self.depin_intrin = intrin_msg
 
     def trigger_callback(self, msg):
-        self.get_logger().info(f"Received trigger: {msg.data}")
 
         self.trigger = msg.data
         if self.trigger and self.arm_T is not None:
@@ -91,11 +88,10 @@ class BerrySaver(Node):
             self.dataset.save_depth_image(self.depth_image)
             self.dataset.save_pointcloud(pcd)
             
-            self.get_logger().info(f"Next random target:\n{self.arm_T}")
             T_ba = np.array(self.arm_T).reshape(4, 4)
-            T_bc = self.rototranslate(T_ba)
+            #T_bc = self.rototranslate(T_ba)
 
-            arm_T_str = str(T_bc)
+            arm_T_str = str(T_ba)
             self.dataset.save_data(arm_T_str, arm_T_str, self.depin_intrin) # I have two arm_T_str because I have arm pose and berry pose, later I will differenciate them
             self.get_logger().info(f"Saved berry dataset ID {self.dataset.idx}")
             self.dataset.idx += 1
