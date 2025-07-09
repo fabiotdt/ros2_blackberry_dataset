@@ -5,7 +5,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge
-from std_msgs.msg import Bool, Float64MultiArray, String
+from std_msgs.msg import Bool, Float64MultiArray, String, Int32
 import re
 import numpy as np
 from geometry_msgs.msg import PoseStamped
@@ -26,6 +26,7 @@ class BerrySaver(Node):
         #self.depin_sub = self.create_subscription(String, '/camera/depth_intrin', self.depin_callback, 10)
 
         self.depin_sub = self.create_subscription(CameraInfo, '/camera/depth_intrin', self.depin_callback, 10)
+        self.idx_sub = self.create_subscription(Int32, '/pose_index', self.idx_callback, 10)
 
         self.color_image = None
         self.depth_image = None
@@ -52,7 +53,7 @@ class BerrySaver(Node):
         
         T_bc = self.T_ac.dot(T_ba)  # Transform from arm frame to camera frame
         return T_bc
-    
+        
     def current_pose_callback(self, msg):
         # Store current pose as SE3 for use in ctraj
         pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
@@ -78,6 +79,11 @@ class BerrySaver(Node):
         self.trigger = msg.data
         if self.trigger and self.arm_T is not None:
             self.save_data()
+
+    def idx_callback(self, msg):
+        # Update the dataset index from the publisher
+        self.dataset.idx = msg.data
+        self.get_logger().info(f"Dataset index updated to {self.dataset.idx}")
 
     def save_data(self):
         if self.color_image is not None and self.depth_image is not None and self.depin_intrin is not None:

@@ -329,7 +329,7 @@ cartesian_motion_controller:
   ros__parameters:
 
     # See the cartesian_compliance_controller
-    end_effector_link: "tool0"
+    end_effector_link: "blackberry" # set the blackberry to the end effector link --> original tool0
     robot_base_link: "$(var tf_prefix)base_link"
     joints:
       - $(var tf_prefix)shoulder_pan_joint
@@ -358,7 +358,7 @@ cartesian_motion_controller:
 
 motion_control_handle:
   ros__parameters:
-    end_effector_link: "tool0"
+    end_effector_link: "blackberry" # set blackberry to the end effector link --> original tool0
     robot_base_link: "$(var tf_prefix)base_link"
     ft_sensor_ref_link: "ft_sensor0_wrench"
     joints:
@@ -371,7 +371,7 @@ motion_control_handle:
       
 end_effector_controller:
   ros__parameters:
-    end_effector_link: "tool0"
+    end_effector_link: "blackberry" # set blackberry to the end effector link --> original tool0
     robot_base_link: "$(var tf_prefix)base_link"
     ft_sensor_ref_link: "ft_sensor0_wrench"
     joints:

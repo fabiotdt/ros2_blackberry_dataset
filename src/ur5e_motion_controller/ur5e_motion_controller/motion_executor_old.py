@@ -2,7 +2,6 @@ import rclpy
 from rclpy.node import Node
 import numpy as np
 from std_msgs.msg import Bool, Float64MultiArray
-from std_msgs.msg import Int32
 import threading
 import sys, select, termios, tty
 import time
@@ -22,7 +21,6 @@ from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation as R
 from roboticstoolbox.tools.trajectory import ctraj
 from spatialmath import SE3
-from ur_dashboard_msgs.msg import SafetyMode
 
 
 class MotionDataLoop(Node):
@@ -39,12 +37,6 @@ class MotionDataLoop(Node):
         self.current_pose = None
         self.create_subscription(PoseStamped, '/berry_pose', self.current_pose_callback, 10)
 
-        self.current_pose_is_safe = True
-        self.create_subscription(SafetyMode, '/io_and_status_controller/safety_mode', self.safety_callback, 10)
-
-        self.idx_pub = self.create_publisher(Int32, '/pose_index', 10)
-
-
         # Trigger the dataset_saver
         self.trigger_pub = self.create_publisher(Bool, '/ur_trigger', 10)
 
@@ -60,11 +52,11 @@ class MotionDataLoop(Node):
         # Periodically check for launching a trajectory
         self.timer = self.create_timer(1.0, self.try_start_loop)
         
+        self.rotation_index= 0
+        self.position_index = 0
         self.trajectory_index = 0
-        self.pose_index = 0 # Index for the current pose in the trajectory
         self.Ts = []
-
-        self.pose_grid_filename = 'src/ur5e_motion_controller/ur5e_motion_controller/pose_grid.npy'
+        self.point_idx = 0 
     
     def current_pose_callback(self, msg):
         # Store current pose as SE3 for use in ctraj
@@ -77,14 +69,10 @@ class MotionDataLoop(Node):
         T[:3, 3] = pos
         self.current_pose = SE3(T)
 
-    def safety_callback(self, msg):
-
-        if msg.mode == SafetyMode.NORMAL:
-            self.get_logger().info("Safety status: NORMAL")
-            self.current_pose_is_safe = True
-        else:
-            self.get_logger().warn(f"Safety issue detected: mode={msg.mode}")
-            self.current_pose_is_safe = False
+    def state_reached_callback(self, msg):
+        if msg.data and self.waiting_for_state:
+            self.waiting_for_state = False
+            self.publish_next_pose()
 
     def keyboard_loop(self):
         try:
@@ -127,37 +115,46 @@ class MotionDataLoop(Node):
         self.in_progress = True
         self.get_logger().info("Starting new motion-data cycle")
         
-        self.load_random_pose()  # Load the pose grid from file
-        self.find_next_incomplete_pose_index() # Find the first incomplete pose index
+        self.create_random_grid()       # Create the grid of points in the workspace
+        self.create_random_pose()       # Create the random poses with different rotations
         self.send_random_trajectory()   # Send the first trajectory to the arm
+    
+    def create_random_grid(self):
+        
+        # Define your workspace bounds in mm
+        ymin, ymax = 0.350, 0.550    
+        xmin, xmax = -0.350, 0.350     
+        zmin, zmax = 0.100, 0.500
 
-    def load_random_pose(self, ):       
+        spacing = 0.10  # 10 cm
+
+        # Create ranges
+        x_vals = np.arange(xmin, xmax + spacing, spacing)
+        y_vals = np.arange(ymin, ymax + spacing, spacing)
+        z_vals = np.arange(zmin, zmax + spacing, spacing)
+
+        # Create a 3D grid of points
+        self.X, self.Y, self.Z = np.meshgrid(x_vals, y_vals, z_vals, indexing='ij') # shape: (len(x_vals), len(y_vals), len(z_vals))
+
+
+    def create_random_pose(self):
+
+        # Discretize roll and pitch with 8 different rotations, (-45 deg, 0, 45),(-45 deg, 0, 45)
+        roll_disc = [-45.0, 0.0, 45.0]
+        pitch_disc = [-45.0, 0.0, 45.0]
+
+        yaw = -90.0
+        # create meshgrid of all combinations
+        self.rotation_combinations = np.array(np.meshgrid(roll_disc, pitch_disc)).T.reshape(-1, 2)
         
-        try:
-            poses = np.load(self.pose_grid_filename , allow_pickle=True)
-            self.get_logger().info(f"Pose grid loaded from {self.pose_grid_filename}")
-            self.pose_list = []
-            for pose in poses:
-                self.pose_list.append({
-                    'position': pose['position'],
-                    'orientation': pose['orientation'],
-                    'completed': pose['completed'],
-                    'is_safe': pose['orientation']
-                })
-            
-            return True
+        self.rotation_combinations = np.hstack((
+            self.rotation_combinations[:, 0:1],                 # (N,1)
+            np.zeros((self.rotation_combinations.shape[0], 1)), # (N,1)
+            self.rotation_combinations[:, 1:2]                  # (N,1)
+        ))
         
-        except Exception as e:
-            self.get_logger().error(f"Failed to load pose grid from {self.pose_grid_filename}: {e}")
-            return False
-        
-    def find_next_incomplete_pose_index(self):
-        for i, pose in enumerate(self.pose_list):
-            if not pose['completed']:
-                self.pose_index = i
-                self.get_logger().info(f"Starting from pose index {self.pose_index} out of {len(self.pose_list)}")
-                return
-        self.position_index = len(self.pose_list)  # All done
+        self.rotation_combinations[:,0] += yaw  # Add yaw to the first column
+
 
     def send_random_trajectory(self):
 
@@ -165,18 +162,28 @@ class MotionDataLoop(Node):
         if self.current_pose is None:
             self.get_logger().warn("Current pose not available yet.")
             return
-                
-        if self.pose_index >= len(self.pose_list):
-            self.get_logger().info("All poses processed.")
-            return
-        
-        self.idx_pub.publish(Int32(data = self.pose_index))
 
         T1 = SE3(self.current_pose)
-        
         self.T2 = np.eye(4)
-        self.T2[:3, 3] = self.pose_list[self.pose_index]['position']
-        self.T2[:3, :3] = self.pose_list[self.pose_index]['orientation']
+
+        self.T2[:3,:3] = R.from_euler('xyz', self.rotation_combinations[self.rotation_index % 9], degrees=True).as_matrix()  # Set the rotation part
+        # Define the first rotation index
+        self.rotation_index += 1
+
+        if self.rotation_index == 9:
+            
+            self.rotation_index = 0  # Reset rotation index after 9 iterations
+            self.position_index += 1
+
+            #if self.position_index >= self.X.size - 1:
+            if self.position_index == 1:
+                self.get_logger().info("Reached the end of the grid.")
+                return
+            
+
+        self.T2[:3, 3] = [self.X.ravel()[self.position_index], 
+                self.Y.ravel()[self.position_index], 
+                self.Z.ravel()[self.position_index]]
 
         self.Ts = ctraj(T1, SE3(self.T2), 500 * 10)
 
@@ -198,7 +205,7 @@ class MotionDataLoop(Node):
         
         if self.trajectory_index == len(self.Ts) - 1:
             self.goal_pub.publish(pose_msg)
-            self.get_logger().info(f"Published final target goal pose of pose {self.pose_index}")
+            self.get_logger().info("Published final target goal pose.")
             
             time.sleep(2)
 
@@ -206,14 +213,7 @@ class MotionDataLoop(Node):
             trigger_msg.data = True
             self.trigger_pub.publish(trigger_msg)
 
-            time.sleep(2)
-
-            self.pose_list[self.pose_index]['completed'] = True
-            self.pose_list[self.pose_index]['is_safe'] = self.current_pose_is_safe
-
-            # Write the updated pose list back to the file
-            np.save(self.pose_grid_filename , self.pose_list)
-            self.pose_index += 1
+            time.sleep(4)
 
             self.trajectory_timer.cancel()
             return

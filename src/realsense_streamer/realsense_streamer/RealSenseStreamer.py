@@ -12,7 +12,7 @@ import cv2
 
 
 class RealSenseStreamer(Node):
-    def __init__(self, w=1280, h=720, fps=30, display=True):
+    def __init__(self, w=1280, h=720, fps=30, display=True): # resolution also 1920 x 1080 but not in the pointcloud --> 1280x720
         super().__init__('realsense_streamer')
         self.bridge = CvBridge()
         self.display = display
@@ -84,6 +84,7 @@ class RealSenseStreamer(Node):
         depth_frame = aligned_frames.get_depth_frame()
 
         depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
+        # print(f"Depth Intrinsics: {depth_intrin}")
 
         if not color_frame or not depth_frame:
             self.get_logger().warn("Frames not received")

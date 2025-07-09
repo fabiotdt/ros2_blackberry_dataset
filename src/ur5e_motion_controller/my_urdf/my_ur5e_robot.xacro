@@ -3,7 +3,7 @@
 
   <!-- Include the standard UR5e robot -->
   <xacro:include filename="$(find ur_description)/urdf/ur.urdf.xacro"/>
-  <!-- <xacro:ur_robot ur_type="ur5e" prefix=""/> -->
+  <!-- <xacro:ur_robot ur_type="ur5e" prefix=""/>  -->
 
   <!-- Include the blackberry macro-->
   <xacro:include filename="$(find ur5e_motion_controller)/my_urdf/ur_ur5e_fake_berry.xacro"/>
