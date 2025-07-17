@@ -1,15 +1,12 @@
 ~/.ros2/easy_handeye2/calibrations$ cat calibrator_cam1.calib 
 
+
+Translation
+	x: 0.023030
+	y: 1.286797
+	z: 0.340484)
 Rotation
-	x: 0.668591
-	y: -0.021271
-	z: -0.006988
-	w: 0.743293Translation
-	x: 0.021829
-	y: 1.267452
-	z: 0.343386)
-Rotation
-	x: 0.668591
-	y: -0.021271
-	z: -0.006988
-	w: 0.743293
+	x: 0.667501
+	y: -0.017524
+	z: -0.005118
+	w: 0.744385	

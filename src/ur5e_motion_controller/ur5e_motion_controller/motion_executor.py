@@ -64,7 +64,7 @@ class MotionDataLoop(Node):
         self.pose_index = 0 # Index for the current pose in the trajectory
         self.Ts = []
 
-        self.pose_grid_filename = 'src/ur5e_motion_controller/ur5e_motion_controller/pose_grid.npy'
+        self.pose_grid_filename = 'src/ur5e_motion_controller/ur5e_motion_controller/dx_poses.npy' #'src/ur5e_motion_controller/ur5e_motion_controller/dx_poses.npy' pose_grid
     
     def current_pose_callback(self, msg):
         # Store current pose as SE3 for use in ctraj
@@ -178,7 +178,7 @@ class MotionDataLoop(Node):
         self.T2[:3, 3] = self.pose_list[self.pose_index]['position']
         self.T2[:3, :3] = self.pose_list[self.pose_index]['orientation']
 
-        self.Ts = ctraj(T1, SE3(self.T2), 500 * 10)
+        self.Ts = ctraj(T1, SE3(self.T2), 8000)
 
         self.trajectory_timer = self.create_timer(0.002, self.publish_next_pose) 
 

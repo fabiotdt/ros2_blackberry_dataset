@@ -65,6 +65,58 @@ class CollisionFreeGridGenerator:
             poses[i]['is_safe'] = False
 
             np.save(self.filename, poses)
+
+    def split_and_save_filtered_poses(self, dx_filename='dx_poses.npy', sx_filename='sx_poses.npy'):
+
+        eliminated_ids = [
+            8, 278, 325, 324, 331, 332, 341, 342, 368, 385,
+            393, 412, 413, 438, 447, 457, 458, 459, 466,
+            476, 485, 486, 487, 488, 591, 636, 676, 677,
+            953, 998, 1006,
+            1312, 1313, 1319, 1321, 1322, 1328, 1331, 1337,
+            1351, 1352, 1357, 1359, 1362, 1365, 1366, 1372,
+            1375, 1376, 1380, 1384, 1390, 1392, 1398, 1401,
+            1402, 1407, 1410, 1417, 1419, 1425, 1428, 1435,
+            1437, 1673
+        ]
+        
+        poses = self.load_pose_grid(self.filename)
+
+        # Filter completed and safe poses
+        completed_and_safe = [
+            pose for idx, pose in enumerate(poses)
+            if pose['completed'] is True and idx not in eliminated_ids
+        ]
+        
+        print(f'the number of completed poses is: {len(completed_and_safe)}')
+
+        # Separate into dx (x > 0) and sx (x < 0)
+        dx_poses = [pose for pose in completed_and_safe if pose['position'][0] > 0]
+        sx_poses = [pose for pose in completed_and_safe if pose['position'][0] < 0]
+
+        dx_poses = self.reset_completed_flag(dx_poses)
+        sx_poses = self.reset_completed_flag(sx_poses)
+
+        # Save them to specified filenames
+        np.save(dx_filename, dx_poses)
+        np.save(sx_filename, sx_poses)
+
+        print(f"Saved {len(dx_poses)} dx poses to {dx_filename}")
+        print(f"Saved {len(sx_poses)} sx poses to {sx_filename}")
+
+    def reset_completed_flag(self, poses, save=False):
+
+        for pose in poses:
+            pose['completed'] = False
+
+        if save:
+            np.save(self.filename, poses)
+            print(f"All 'completed' flags set to False and saved to {self.filename}")
+        else:
+            print("All 'completed' flags set to False (not saved)")
+
+        return poses
+        
   
 # Example usage
 if __name__ == "__main__":
@@ -72,12 +124,18 @@ if __name__ == "__main__":
     
     #generator.save_pose_grid()  # Save the generated pose grid to a file
     
-    grid = generator.load_pose_grid()  # Load the pose grid from the file
+    #grid = generator.load_pose_grid()  # Load the pose grid from the file
 
     #print(f'The last pose in the grid is:\n{grid[486]}')  # Print the last pose for verification
 
-    modify_list = [1437]
+    #modify_list = [1673]
 
-    generator.modify_pose_grid(grid, modify_list)  # Modify the pose grid based on the list
+    #generator.modify_pose_grid(grid, modify_list)  # Modify the pose grid based on the list
 
-    print(f'Overall poses: {len(grid)}')
+    generator.split_and_save_filtered_poses()
+
+    #print(f'Overall poses: {len(grid)}')
+
+
+
+
