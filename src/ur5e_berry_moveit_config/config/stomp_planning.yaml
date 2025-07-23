@@ -1,0 +1,15 @@
+planning_plugins:
+  - stomp_moveit/StompPlanner
+request_adapters: default_planner_request_adapters/AddTimeOptimalParameterization
+response_adapters:
+  - default_planning_response_adapters/AddTimeOptimalParameterization
+
+stomp_moveit:
+  num_timesteps: 60
+  num_iterations: 120
+  num_iterations_after_valid: 0
+  num_rollouts: 30
+  max_rollouts: 30
+  exponentiated_cost_sensitivity: 0.5
+  control_cost_weight: 0.1
+  delta_t: 0.1

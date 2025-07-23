@@ -20,10 +20,12 @@ class PoseGoalPlanner : public rclcpp::Node {
     srv_ = this->create_service<MoveToPoseSrv>(
         "move_to_pose",
         std::bind(&PoseGoalPlanner::poseGoalCallback, this, _1, _2));
-
+    move_group_.setPlannerId("stomp");
     move_group_.setPlanningTime(5.0);
-    move_group_.setMaxVelocityScalingFactor(1.0);
-    move_group_.setMaxAccelerationScalingFactor(1.0);
+    move_group_.setMaxVelocityScalingFactor(0.1);
+    move_group_.setMaxAccelerationScalingFactor(0.1);
+    // set tolerance
+    move_group_.setGoalPositionTolerance(0.04);
 
     RCLCPP_INFO(this->get_logger(), "PoseGoalPlanner service ready.");
   }

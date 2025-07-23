@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
 
   // Electric panel
   primitives[1].type = primitives[1].BOX;
-  primitives[1].dimensions = {0.225, 1.0, 0.175};
+  primitives[1].dimensions = {0.24, 1.0, 0.40};
   poses[1].orientation.w = -0.707;
   poses[1].orientation.z = 0.707;
   // poses[1].position = {0.0, -0.255, 0.92 - 0.075};
