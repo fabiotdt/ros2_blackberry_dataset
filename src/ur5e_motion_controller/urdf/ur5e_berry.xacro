@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot name="ur5e" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro" />
+    <link name="world" />
+    <!--This
+    will create the scene where the robot is located in-->
+    <xacro:ur_robot
+        name="ur5e"
+        tf_prefix=""
+        parent="world"
+        joint_limits_parameters_file="$(find ur_description)/config/ur5e/joint_limits.yaml"
+        kinematics_parameters_file="$(find ur_description)/config/ur5e/default_kinematics.yaml"
+        physical_parameters_file="$(find ur_description)/config/ur5e/physical_parameters.yaml"
+        visual_parameters_file="$(find ur_description)/config/ur5e/visual_parameters.yaml"
+    >
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:ur_robot>
+
+    <link name="blackberry">
+        <visual>
+            <origin xyz="0.0 0.0 -0.07748" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="file://$(find ur5e_motion_controller)/meshes/fake_berry_2.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="">
+                <color rgba="1.0 0.0 0.0 1.0 " /> <!-- Red: 1 0 0 1 --> <!-- Gray: 0.2 0.2 0.2 1 -->
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0 0.0 -0.07748" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="file://$(find ur5e_motion_controller)/meshes/fake_berry_2.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="fake_berry" type="fixed">
+        <parent link="tool0" />
+        <child link="blackberry" />
+        <origin xyz="0.0 0.0 0.07748" rpy="0.0 0.0 0.0" />
+    </joint>
+
+
+  <!--Create the control tag for the UR robot-->
+
+
+</robot>
