@@ -25,7 +25,7 @@
     <xacro:property name="kinematics_hash"
         value="${xacro.load_yaml(kinematics_params_file)['kinematics']['hash']}" />
     <xacro:ur_robot
-        name="ur5e_berry_control"
+        name="ur5e"
         parent="world"
         tf_prefix=""
         joint_limits_parameters_file="$(find ur_description)/config/ur5e/joint_limits.yaml"
@@ -64,7 +64,7 @@
     </joint>
 
     <xacro:ur_ros2_control
-        name="ur5e_berry_control"
+        name="ur5e"
         tf_prefix=""
         hash_kinematics="${kinematics_hash}"
         robot_ip="$(arg robot_ip)"

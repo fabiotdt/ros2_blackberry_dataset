@@ -22,28 +22,35 @@ int main(int argc, char** argv) {
   auto node =
       std::make_shared<rclcpp::Node>("collision_object_node", node_options);
 
-  // Allow RViz and other nodes to come up
-  rclcpp::sleep_for(5s);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  std::thread([&executor]() { executor.spin(); }).detach();
 
   // Initialize TF buffer and PlanningSceneMonitor
   auto tf_buffer = std::make_shared<tf2_ros::Buffer>(node->get_clock());
   auto tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
-  auto planning_scene_monitor =
-      std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(
-          node, "robot_description", tf_buffer, "planning_scene_monitor");
+  // auto planning_scene_monitor =
+  //     std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(
+  //         node, "robot_description", tf_buffer, "planning_scene_monitor");
 
-  if (!planning_scene_monitor->getPlanningScene()) {
-    RCLCPP_ERROR(LOGGER, "Planning scene not configured.");
-    return EXIT_FAILURE;
+  auto scene_pub = node->create_publisher<moveit_msgs::msg::PlanningScene>(
+      "planning_scene", 1);
+  while (scene_pub->get_subscription_count() < 1) {
+    rclcpp::sleep_for(std::chrono::milliseconds(500));
   }
+  // if (!planning_scene_monitor->getPlanningScene()) {
+  //   RCLCPP_ERROR(LOGGER, "Planning scene not configured.");
+  //   return EXIT_FAILURE;
+  // }
 
-  planning_scene_monitor->startStateMonitor("/joint_states");
-  planning_scene_monitor->setPlanningScenePublishingFrequency(25);
-  planning_scene_monitor->startPublishingPlanningScene(
-      planning_scene_monitor::PlanningSceneMonitor::UPDATE_SCENE,
-      "/planning_scene");
-  planning_scene_monitor->startSceneMonitor();
-  planning_scene_monitor->providePlanningSceneService();
+  // planning_scene_monitor->startStateMonitor("/joint_states");
+  // planning_scene_monitor->setPlanningScenePublishingFrequency(25);
+  // planning_scene_monitor->startPublishingPlanningScene(
+  //     planning_scene_monitor::PlanningSceneMonitor::UPDATE_NONE,
+  //     "/planning_scene");
+
+  // planning_scene_monitor->startSceneMonitor();
+  // planning_scene_monitor->providePlanningSceneService();
 
   // Define collision objects
   std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
@@ -116,15 +123,16 @@ int main(int argc, char** argv) {
   ps.is_diff = true;
   ps.world.collision_objects = collision_objects;
 
-  auto scene_pub = node->create_publisher<moveit_msgs::msg::PlanningScene>(
-      "planning_scene", 10);
-  scene_pub->publish(ps);
+  // while (!planning_scene_monitor->getStateMonitor()->haveCompleteState()) {
+  //   rclcpp::sleep_for(100ms);
+  // }
+  RCLCPP_INFO(LOGGER, "Robot state is ready. Publishing planning scene.");
 
-  // Spin node
-  rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(node);
-  executor.spin();
-
+  RCLCPP_WARN(LOGGER, "Publishing planning scene update");
+  for (int i = 0; i < 40; ++i) {
+    scene_pub->publish(ps);
+    rclcpp::sleep_for(100ms);
+  }
   rclcpp::shutdown();
   return 0;
 }
