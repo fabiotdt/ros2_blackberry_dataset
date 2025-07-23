@@ -1,19 +1,40 @@
 <?xml version="1.0"?>
-<robot name="ur5e" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="ur5e_berry" xmlns:xacro="http://ros.org/wiki/xacro">
 
+    <!-- <xacro:include filename="$(find ur5e_motion_controller)/urdf/ur5e_berry.xacro" /> -->
     <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro" />
     <xacro:include filename="$(find ur_description)/urdf/ur.ros2_control.xacro" />
+
     <link name="world" />
+    <!--This
+    will create the scene where the robot is located in-->
+
+    <xacro:arg name="robot_ip" default="0.0.0.0" />
+    <xacro:arg name="headless_mode" default="true" />
+    <xacro:arg name="ur_script_filename"
+        default="$(find ur_client_library)/resources/external_control.urscript" />
+    <xacro:arg name="ur_output_recipe_filename"
+        default="$(find ur_robot_driver)/resources/rtde_output_recipe.txt" />
+    <xacro:arg name="ur_input_recipe_filename"
+        default="$(find ur_robot_driver)/resources/rtde_input_recipe.txt" />
+    <xacro:arg name="use_fake_hardware" default="false" />
+    <xacro:arg name="fake_sensor_commands" default="false" />
+    <!--find
+    hash_kinematics in kinematics_params-->
+    <xacro:property name="kinematics_params_file" value="$(arg kinematics_params)" />
+    <xacro:property name="kinematics_hash"
+        value="${xacro.load_yaml(kinematics_params_file)['kinematics']['hash']}" />
     <xacro:ur_robot
-        name="ur5e"
-        tf_prefix=""
+        name="ur5e_berry_control"
         parent="world"
+        tf_prefix=""
         joint_limits_parameters_file="$(find ur_description)/config/ur5e/joint_limits.yaml"
         kinematics_parameters_file="$(find ur_description)/config/ur5e/default_kinematics.yaml"
         physical_parameters_file="$(find ur_description)/config/ur5e/physical_parameters.yaml"
         visual_parameters_file="$(find ur_description)/config/ur5e/visual_parameters.yaml"
+        generate_ros2_control_tag="false"
     >
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 1.79" rpy="${pi} 0 ${pi}" />
     </xacro:ur_robot>
 
     <link name="blackberry">
@@ -42,25 +63,8 @@
         <origin xyz="0.0 0.0 0.07748" rpy="0.0 0.0 0.0" />
     </joint>
 
-
-    <xacro:arg name="robot_ip" default="0.0.0.0" />
-    <xacro:arg name="headless_mode" default="false" />
-    <xacro:arg name="ur_script_filename"
-        default="$(find ur_client_library)/resources/external_control.urscript" />
-    <xacro:arg name="ur_output_recipe_filename"
-        default="$(find ur_robot_driver)/resources/rtde_output_recipe.txt" />
-    <xacro:arg name="ur_input_recipe_filename"
-        default="$(find ur_robot_driver)/resources/rtde_input_recipe.txt" />
-    <xacro:arg name="use_fake_hardware" default="false" />
-    <xacro:arg name="fake_sensor_commands" default="false" />
-    <!--find
-    hash_kinematics in kinematics_params-->
-    <xacro:property name="kinematics_params_file" value="$(arg kinematics_params)" />
-    <xacro:property name="kinematics_hash"
-        value="${xacro.load_yaml(kinematics_params_file)['kinematics']['hash']}" />
-
     <xacro:ur_ros2_control
-        name="ur5e"
+        name="ur5e_berry_control"
         tf_prefix=""
         hash_kinematics="${kinematics_hash}"
         robot_ip="$(arg robot_ip)"
@@ -71,8 +75,6 @@
         fake_sensor_commands="$(arg fake_sensor_commands)"
         headless_mode="$(arg headless_mode)"
     />
-
-
     <!--Create
     the control tag for the UR robot-->
 

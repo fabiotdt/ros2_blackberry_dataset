@@ -6,7 +6,12 @@ from launch_ros.parameter_descriptions import ParameterValue
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.conditions import IfCondition, UnlessCondition
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 
 
 def launch_setup(context, *args, **kwargs):
@@ -47,16 +52,35 @@ def launch_setup(context, *args, **kwargs):
         [FindPackageShare(description_package), "config", ur_type, "joint_limits.yaml"]
     )
     kinematics_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "robot_calibration.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "robot_calibration.yaml",
+        ]
     )
     physical_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "physical_parameters.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "physical_parameters.yaml",
+        ]
     )
     visual_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "visual_parameters.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "visual_parameters.yaml",
+        ]
     )
     script_filename = PathJoinSubstitution(
-        [FindPackageShare("ur_client_library"), "resources", "external_control.urscript"]
+        [
+            FindPackageShare("ur_client_library"),
+            "resources",
+            "external_control.urscript",
+        ]
     )
     input_recipe_filename = PathJoinSubstitution(
         [FindPackageShare("ur_robot_driver"), "resources", "rtde_input_recipe.txt"]
@@ -65,22 +89,22 @@ def launch_setup(context, *args, **kwargs):
         [FindPackageShare("ur_robot_driver"), "resources", "rtde_output_recipe.txt"]
     )
 
-        # Path to my XACRO file
-    xacro_file = PathJoinSubstitution([
-        FindPackageShare("ur5e_motion_controller"),
-        "my_urdf",
-        LaunchConfiguration("description_file")
-    ])
-
+    # Path to my XACRO file
+    xacro_file = PathJoinSubstitution(
+        [
+            FindPackageShare("ur5e_motion_controller"),
+            "urdf",
+            LaunchConfiguration("description_file"),
+        ]
+    )
 
     robot_description_content = Command(
-        [   
-
+        [
             # PathJoinSubstitution([FindExecutable(name="xacro")]),
             # " ",
             FindExecutable(name="xacro"),
             " ",
-            xacro_file, # Path for my custom XACRO file
+            xacro_file,  # Path for my custom XACRO file
             " ",
             # PathJoinSubstitution([FindPackageShare(description_package), "urdf", description_file]),
             # " ",
@@ -167,11 +191,12 @@ def launch_setup(context, *args, **kwargs):
             " ",
         ]
     )
-    
-    #robot_description = {"robot_description": robot_description_content}
 
-    robot_description = {"robot_description": ParameterValue(robot_description_content, value_type=str)
-}
+    # robot_description = {"robot_description": robot_description_content}
+
+    robot_description = {
+        "robot_description": ParameterValue(robot_description_content, value_type=str)
+    }
 
     initial_joint_controllers = PathJoinSubstitution(
         [FindPackageShare("ur5e_motion_controller"), "config", controllers_file]
@@ -212,40 +237,50 @@ def launch_setup(context, *args, **kwargs):
         ],
         output="screen",
         condition=UnlessCondition(use_fake_hardware),
-                remappings=[
-            ('motion_control_handle/target_frame', 'target_frame'),
-            ('cartesian_motion_controller/target_frame', 'target_frame'),
-            ('cartesian_compliance_controller/target_frame', 'target_frame'),
-            ('cartesian_compliance_controller/target_wrench', 'target_wrench'),
+        remappings=[
+            ("motion_control_handle/target_frame", "target_frame"),
+            ("cartesian_motion_controller/target_frame", "target_frame"),
+            ("cartesian_compliance_controller/target_frame", "target_frame"),
+            ("cartesian_compliance_controller/target_wrench", "target_wrench"),
             # ('cartesian_compliance_controller/ft_sensor_wrench', 'bus0/ft_sensor0/ft_sensor_readings/wrench'),
-            ('cartesian_compliance_controller/ft_sensor_wrench', '/force_torque_sensor_broadcaster/wrench'),
-            ('cartesian_adaptive_compliance_controller/target_frame', 'target_frame'),
-            ('cartesian_adaptive_compliance_controller/target_wrench', 'target_wrench'),
+            (
+                "cartesian_compliance_controller/ft_sensor_wrench",
+                "/force_torque_sensor_broadcaster/wrench",
+            ),
+            ("cartesian_adaptive_compliance_controller/target_frame", "target_frame"),
+            ("cartesian_adaptive_compliance_controller/target_wrench", "target_wrench"),
             # ('cartesian_adaptive_compliance_controller/ft_sensor_wrench', 'bus0/ft_sensor0/ft_sensor_readings/wrench'),
-            ('cartesian_adaptive_compliance_controller/ft_sensor_wrench', '/force_torque_sensor_broadcaster/wrench'),
-        ]
+            (
+                "cartesian_adaptive_compliance_controller/ft_sensor_wrench",
+                "/force_torque_sensor_broadcaster/wrench",
+            ),
+        ],
     )
 
-    #LOADING CONTROLLERS
-    spawner="spawner"
+    # LOADING CONTROLLERS
+    spawner = "spawner"
     cartesian_compliance_controller_spawner = Node(
         package="controller_manager",
         executable=spawner,
-        arguments=["cartesian_compliance_controller","-c", "/controller_manager"],
+        arguments=["cartesian_compliance_controller", "-c", "/controller_manager"],
     )
-    spawner="spawner"
+    spawner = "spawner"
     cartesian_adaptive_compliance_controller_spawner = Node(
         package="controller_manager",
         executable=spawner,
-        arguments=["cartesian_adaptive_compliance_controller","-c", "/controller_manager"],
+        arguments=[
+            "cartesian_adaptive_compliance_controller",
+            "-c",
+            "/controller_manager",
+        ],
     )
-    
+
     # cartesian_force_controller_spawner = Node(
     #     package="controller_manager",
     #     executable=spawner,
     #     arguments=["cartesian_force_controller", "--stopped", "-c", "/controller_manager"],
     # )
-    
+
     cartesian_motion_controller_spawner = Node(
         package="controller_manager",
         executable=spawner,
@@ -255,11 +290,12 @@ def launch_setup(context, *args, **kwargs):
         package="controller_manager",
         executable=spawner,
         arguments=["motion_control_handle", "-c", "/controller_manager"],
-    )  
+    )
 
     dashboard_client_node = Node(
         package="ur_robot_driver",
-        condition=IfCondition(launch_dashboard_client) and UnlessCondition(use_fake_hardware),
+        condition=IfCondition(launch_dashboard_client)
+        and UnlessCondition(use_fake_hardware),
         executable="dashboard_client",
         name="dashboard_client",
         output="screen",
@@ -350,8 +386,11 @@ def launch_setup(context, *args, **kwargs):
     ]
     controller_spawner_inactive_names = ["forward_position_controller"]
 
-    controller_spawners = [controller_spawner(name) for name in controller_spawner_names] + [
-        controller_spawner(name, active=False) for name in controller_spawner_inactive_names
+    controller_spawners = [
+        controller_spawner(name) for name in controller_spawner_names
+    ] + [
+        controller_spawner(name, active=False)
+        for name in controller_spawner_inactive_names
     ]
 
     # There may be other controllers of the joints, but this is the initially-started one
@@ -387,33 +426,41 @@ def launch_setup(context, *args, **kwargs):
         executable="static_transform_publisher",
         name="ground_publisher",
         arguments=[
-            "0.0", "0.0", "1.79", "3.14", "0.0", "3.14",  # x, y, z, roll, pitch, yaw
+            "0.0",
+            "0.0",
+            "1.79",
+            "3.14",
+            "0.0",
+            "3.14",  # x, y, z, roll, pitch, yaw
             tf_prefix.perform(context) + "world",  # parent frame
             tf_prefix.perform(context) + "base_link",  # child frame
         ],
         output="screen",
-        respawn=True, 
+        respawn=True,
     )
     # os.system(" ros2 service call /bus0/ft_sensor0/reset_wrench rokubimini_msgs/srv/ResetWrench \"desired_wrench:  force: x: 0.0 y: 0.0 z: 0.0 torque: x: 0.0 y: 0.0 z: 0.0\" ")
-    nodes_to_start = [
-        
-        control_node,
-        ur_control_node,
-        dashboard_client_node,
-        tool_communication_node,
-        controller_stopper_node,
-        urscript_interface,
-        robot_state_publisher_node,
-        rviz_node,
-        # initial_joint_controller_spawner_stopped,
-        # initial_joint_controller_spawner_started,
-        # motion_control_handle_spawner,
-        # cartesian_compliance_controller_spawner,
-        # cartesian_motion_controller_spawner,
-        # cartesian_adaptive_compliance_controller_spawner,
-        # cartesian_force_controller_spawner,
-        cartesian_motion_controller_spawner,
-    ] + controller_spawners + [static_transform_publisher]
+    nodes_to_start = (
+        [
+            control_node,
+            ur_control_node,
+            dashboard_client_node,
+            tool_communication_node,
+            controller_stopper_node,
+            urscript_interface,
+            robot_state_publisher_node,
+            rviz_node,
+            # initial_joint_controller_spawner_stopped,
+            # initial_joint_controller_spawner_started,
+            # motion_control_handle_spawner,
+            # cartesian_compliance_controller_spawner,
+            # cartesian_motion_controller_spawner,
+            # cartesian_adaptive_compliance_controller_spawner,
+            # cartesian_force_controller_spawner,
+            cartesian_motion_controller_spawner,
+        ]
+        + controller_spawners
+        + [static_transform_publisher]
+    )
 
     return nodes_to_start
 
@@ -431,8 +478,9 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            "robot_ip", description="IP address by which the robot can be reached.",
-            default_value="192.168.100.14"
+            "robot_ip",
+            description="IP address by which the robot can be reached.",
+            default_value="192.168.100.14",
         )
     )
     declared_arguments.append(
@@ -498,7 +546,6 @@ def generate_launch_description():
         )
     )
 
-
     declared_arguments.append(
         DeclareLaunchArgument(
             "tf_prefix",
@@ -552,11 +599,15 @@ def generate_launch_description():
         )
     )
     declared_arguments.append(
-        DeclareLaunchArgument("launch_rviz", default_value="true", description="Launch RViz?")
+        DeclareLaunchArgument(
+            "launch_rviz", default_value="true", description="Launch RViz?"
+        )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            "launch_dashboard_client", default_value="true", description="Launch Dashboard Client?"
+            "launch_dashboard_client",
+            default_value="true",
+            description="Launch Dashboard Client?",
         )
     )
     declared_arguments.append(
@@ -645,4 +696,6 @@ def generate_launch_description():
         )
     )
 
-    return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
+    return LaunchDescription(
+        declared_arguments + [OpaqueFunction(function=launch_setup)]
+    )

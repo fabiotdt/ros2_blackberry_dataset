@@ -2,13 +2,13 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="my_ur5e_robot">
 
   <!-- Include the standard UR5e robot -->
-  <xacro:include filename="$(find ur_description)/urdf/ur.urdf.xacro"/>
+  <xacro:include filename="$(find ur_description)/urdf/ur.urdf.xacro" />
   <!-- <xacro:ur_robot ur_type="ur5e" prefix=""/>  -->
 
   <!-- Include the blackberry macro-->
-  <xacro:include filename="$(find ur5e_motion_controller)/my_urdf/ur_ur5e_fake_berry.xacro"/>
+  <xacro:include filename="$(find ur5e_motion_controller)/urdf/ur_ur5e_fake_berry.xacro" />
 
   <!-- Call the macro to add probe -->
-  <xacro:add_blackberry/>
+  <xacro:add_blackberry />
 
 </robot>

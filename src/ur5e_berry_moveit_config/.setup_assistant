@@ -1,9 +1,9 @@
 moveit_setup_assistant_config:
   urdf:
     package: ur5e_motion_controller
-    relative_path: my_urdf/ur5e_berry.xacro
+    relative_path: urdf/ur5e_berry.xacro
   srdf:
-    relative_path: config/ur5e.srdf
+    relative_path: config/ur5e_berry.srdf
   package_settings:
     author_name: ""
     author_email: ""

@@ -26,18 +26,20 @@ def generate_launch_description():
                 "ur20",
                 "ur30",
             ],
-            default_value="ur20",
+            default_value="ur5e",
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             "robot_ip",
-            default_value="192.168.56.101",  # put your robot's IP address here
+            default_value="192.168.100.14",  # put your robot's IP address here
             description="IP address by which the robot can be reached.",
         )
     )
     declared_arguments.append(
-        DeclareLaunchArgument("launch_rviz", default_value="true", description="Launch RViz?")
+        DeclareLaunchArgument(
+            "launch_rviz", default_value="false", description="Launch RViz?"
+        )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
@@ -104,7 +106,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "headless_mode",
-            default_value="false",
+            default_value="true",
             description="Enable headless mode for robot control",
         )
     )
@@ -132,7 +134,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "ur_type": "ur5e",
-            "robot_ip": "192.168.1.14",
+            "robot_ip": robot_ip,
             "tf_prefix": "",
             "launch_rviz": launch_rviz,
             "use_fake_hardware": use_fake_hardware,
