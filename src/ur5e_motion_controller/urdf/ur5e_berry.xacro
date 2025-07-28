@@ -13,8 +13,9 @@
         kinematics_parameters_file="$(find ur_description)/config/ur5e/default_kinematics.yaml"
         physical_parameters_file="$(find ur_description)/config/ur5e/physical_parameters.yaml"
         visual_parameters_file="$(find ur_description)/config/ur5e/visual_parameters.yaml"
+        initial_positions="${dict(shoulder_pan_joint=-1.57,shoulder_lift_joint=-1.57,elbow_joint=-1.70,wrist_1_joint=-1.57,wrist_2_joint=-1.57,wrist_3_joint=0.0)}"
     >
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 1.79" rpy="${pi} 0 ${pi}" />
     </xacro:ur_robot>
 
     <link name="blackberry">

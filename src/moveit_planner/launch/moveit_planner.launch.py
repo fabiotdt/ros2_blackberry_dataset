@@ -1,16 +1,21 @@
 from launch import LaunchDescription
-from launch.substitutions import Command, PathJoinSubstitution
-from launch_ros.actions import Node
-from launch_ros.parameter_descriptions import ParameterValue
-from launch_ros.substitutions import FindPackageShare
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
-# Timer action to delay the execution of the launch description
-from launch.actions import TimerAction
+from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    use_fake_hardware_arg = DeclareLaunchArgument(
+        "use_fake_hardware",
+        default_value="false",
+        description="Whether to use fake hardware or real hardware",
+    )
+
+    use_fake_hardware = LaunchConfiguration("use_fake_hardware")
+
+    # UR controller node (first to launch)
     ur_controller = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
@@ -26,72 +31,95 @@ def generate_launch_description():
             "robot_ip": "192.168.100.14",
             "launch_rviz": "false",
             "headless_mode": "true",
+            "use_fake_hardware": use_fake_hardware,
         }.items(),
     )
-    moveit_planner = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("ur5e_berry_moveit_config"),
-                    "launch",
-                    "move_group.launch.py",
-                ]
+
+    # MoveIt planner after 5s
+    moveit_planner = TimerAction(
+        period=5.0,
+        actions=[
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("ur5e_berry_moveit_config"),
+                            "launch",
+                            "move_group.launch.py",
+                        ]
+                    )
+                )
             )
-        ),
-    )
-    # Delay the execution of the moveit_planner launch file
-    delay_moveit_planner = TimerAction(
-        period=5.0,  # Delay for 5 seconds
-        actions=[moveit_planner],
-    )
-    # collision loader
-    collision_loader = Node(
-        package="moveit_planner",
-        executable="collision_loader_node",
-        name="collision_loader_node",
-        output="screen",
-    )
-    delayed_collision_loader = TimerAction(
-        period=6.0,  # Delay for 5 seconds
-        actions=[collision_loader],
-    )
-    # # moveit_commander_node
-    moveit_commander = Node(
-        package="moveit_planner",
-        executable="moveit_commander_node",
-        name="moveit_commander_node",
-        output="screen",
-    )
-    delayed_moveit_commander = TimerAction(
-        period=7.0,  # Delay for 7 seconds
-        actions=[moveit_commander],
-    )
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="screen",
-        arguments=[
-            "-d",
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("moveit_planner"),
-                    "rviz",
-                    "moveit_rviz.rviz",
-                ]
-            ),
         ],
     )
-    delayed_rviz_node = TimerAction(
-        period=6.0,  # Delay for 8 seconds
-        actions=[rviz_node],
+
+    # RViz node after 6s
+    rviz_node = TimerAction(
+        period=6.0,
+        actions=[
+            # Node(
+            #     package="rviz2",
+            #     executable="rviz2",
+            #     name="rviz2",
+            #     output="screen",
+            #     arguments=[
+            #         "-d",
+            #         PathJoinSubstitution(
+            #             [
+            #                 FindPackageShare("moveit_planner"),
+            #                 "rviz",
+            #                 "moveit_rviz.rviz",
+            #             ]
+            #         ),
+            #     ],
+            # )
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("ur5e_berry_moveit_config"),
+                            "launch",
+                            "moveit_rviz.launch.py",
+                        ]
+                    )
+                ),
+            )
+        ],
     )
+
+    # Collision loader after 6s
+    collision_loader = TimerAction(
+        period=6.0,
+        actions=[
+            Node(
+                package="moveit_planner",
+                executable="collision_loader_node",
+                name="collision_loader_node",
+                output="screen",
+            )
+        ],
+    )
+
+    # MoveIt commander after 7s
+    moveit_commander = TimerAction(
+        period=7.0,
+        actions=[
+            Node(
+                package="moveit_planner",
+                executable="moveit_commander_node",
+                name="moveit_commander_node",
+                output="screen",
+            )
+        ],
+    )
+
     return LaunchDescription(
         [
+            use_fake_hardware_arg,
             ur_controller,
-            delay_moveit_planner,
-            delayed_rviz_node,
-            delayed_collision_loader,
-            delayed_moveit_commander,
+            moveit_planner,
+            rviz_node,
+            # collision_loader,
+            # moveit_commander,
         ]
     )

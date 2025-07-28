@@ -25,6 +25,9 @@ are defined
     <group name="ur_arm">
         <chain base_link="base_link" tip_link="blackberry" />
     </group>
+    <!--VIRTUAL
+    JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame
+    of reference (considered fixed with respect to the robot)-->
     <!--DISABLE
     COLLISIONS: By default it is assumed that any link of the robot could potentially come into
     collision with any other link in the robot. This tag disables collision checking between a

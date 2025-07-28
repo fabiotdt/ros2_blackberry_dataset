@@ -26,34 +26,42 @@ int main(int argc, char** argv) {
   executor.add_node(node);
   std::thread([&executor]() { executor.spin(); }).detach();
 
-  // Initialize TF buffer and PlanningSceneMonitor
+  // TF buffer and listener
   auto tf_buffer = std::make_shared<tf2_ros::Buffer>(node->get_clock());
   auto tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
-  // auto planning_scene_monitor =
-  //     std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(
-  //         node, "robot_description", tf_buffer, "planning_scene_monitor");
 
-  auto scene_pub = node->create_publisher<moveit_msgs::msg::PlanningScene>(
-      "planning_scene", 1);
-  while (scene_pub->get_subscription_count() < 1) {
-    rclcpp::sleep_for(std::chrono::milliseconds(500));
+  // Setup PlanningSceneMonitor
+  auto planning_scene_monitor =
+      std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(
+          node, "robot_description", tf_buffer, "planning_scene_monitor");
+
+  if (!planning_scene_monitor->getPlanningScene()) {
+    RCLCPP_ERROR(LOGGER, "Planning scene not configured.");
+    return EXIT_FAILURE;
   }
-  // if (!planning_scene_monitor->getPlanningScene()) {
-  //   RCLCPP_ERROR(LOGGER, "Planning scene not configured.");
-  //   return EXIT_FAILURE;
-  // }
+  // print planning frame
+  // RCLCPP_INFO(LOGGER, "Planning frame: %s",
+  //             planning_scene_monitor->getPlanningFrame().c_str());
 
+  // Start monitoring
+  // planning_scene_monitor->startSceneMonitor();
   // planning_scene_monitor->startStateMonitor("/joint_states");
-  // planning_scene_monitor->setPlanningScenePublishingFrequency(25);
+  // planning_scene_monitor->startWorldGeometryMonitor();  // Optional: for
+  // octomap
+  // planning_scene_monitor->setPlanningScenePublishingFrequency(25.0);
   // planning_scene_monitor->startPublishingPlanningScene(
-  //     planning_scene_monitor::PlanningSceneMonitor::UPDATE_NONE,
+  //     planning_scene_monitor::PlanningSceneMonitor::UPDATE_SCENE,
   //     "/planning_scene");
 
-  // planning_scene_monitor->startSceneMonitor();
-  // planning_scene_monitor->providePlanningSceneService();
+  // Wait for robot state to be ready
+  while (!planning_scene_monitor->getStateMonitor()->haveCompleteState()) {
+    RCLCPP_INFO(LOGGER, "Waiting for complete joint state...");
+    rclcpp::sleep_for(200ms);
+  }
+
+  RCLCPP_INFO(LOGGER, "Robot state is ready. Adding collision objects...");
 
   // Define collision objects
-  std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
   std::vector<std::string> object_ids = {"desk", "electric_panel", "wall",
                                          "top_plate", "plug"};
   std::vector<shape_msgs::msg::SolidPrimitive> primitives(5);
@@ -73,7 +81,6 @@ int main(int argc, char** argv) {
   primitives[1].dimensions = {0.24, 1.0, 0.40};
   poses[1].orientation.w = -0.707;
   poses[1].orientation.z = 0.707;
-  // poses[1].position = {0.0, -0.255, 0.92 - 0.075};
   poses[1].position.x = 0.0;
   poses[1].position.y = -0.255;
   poses[1].position.z = 0.92 - 0.075;
@@ -83,7 +90,6 @@ int main(int argc, char** argv) {
   primitives[2].dimensions = {0.05, 1.0, 2.0};
   poses[2].orientation.w = -0.707;
   poses[2].orientation.z = 0.707;
-  // poses[2].position = {0.0, -0.375, 1.0};
   poses[2].position.x = 0.0;
   poses[2].position.y = -0.375;
   poses[2].position.z = 1.0;
@@ -93,7 +99,6 @@ int main(int argc, char** argv) {
   primitives[3].dimensions = {0.5, 1.0, 0.05};
   poses[3].orientation.w = -0.707;
   poses[3].orientation.z = 0.707;
-  // poses[3].position = {0.0, -0.15, -0.026};
   poses[3].position.x = 0.0;
   poses[3].position.y = -0.15;
   poses[3].position.z = -0.026;
@@ -103,11 +108,12 @@ int main(int argc, char** argv) {
   primitives[4].dimensions = {0.1, 0.12, 0.09};
   poses[4].orientation.w = -0.707;
   poses[4].orientation.z = 0.707;
-  // poses[4].position = {0.44, -0.2, 0.92 - 0.06};
   poses[4].position.x = 0.44;
   poses[4].position.y = -0.2;
   poses[4].position.z = 0.92 - 0.06;
 
+  // Add objects to planning scene
+  planning_scene_monitor::LockedPlanningSceneRW scene(planning_scene_monitor);
   for (size_t i = 0; i < object_ids.size(); ++i) {
     moveit_msgs::msg::CollisionObject obj;
     obj.header.frame_id = "base_link";
@@ -115,24 +121,21 @@ int main(int argc, char** argv) {
     obj.primitives.push_back(primitives[i]);
     obj.primitive_poses.push_back(poses[i]);
     obj.operation = obj.ADD;
-    collision_objects.push_back(obj);
+
+    scene->processCollisionObjectMsg(obj);
   }
 
-  // Publish planning scene update
-  moveit_msgs::msg::PlanningScene ps;
-  ps.is_diff = true;
-  ps.world.collision_objects = collision_objects;
+  // Publish the planning scene
+  auto scene_pub = node->create_publisher<moveit_msgs::msg::PlanningScene>(
+      "planning_scene", 1);
+  moveit_msgs::msg::PlanningScene planning_scene_msg;
+  scene->getPlanningSceneMsg(planning_scene_msg);
+  planning_scene_msg.is_diff = true;
+  scene_pub->publish(planning_scene_msg);
+  RCLCPP_INFO(LOGGER, "Collision objects added to the planning scene.");
 
-  // while (!planning_scene_monitor->getStateMonitor()->haveCompleteState()) {
-  //   rclcpp::sleep_for(100ms);
-  // }
-  RCLCPP_INFO(LOGGER, "Robot state is ready. Publishing planning scene.");
-
-  RCLCPP_WARN(LOGGER, "Publishing planning scene update");
-  for (int i = 0; i < 40; ++i) {
-    scene_pub->publish(ps);
-    rclcpp::sleep_for(100ms);
-  }
+  // Keep node alive for a bit to ensure publishing occurs
+  rclcpp::sleep_for(2s);
   rclcpp::shutdown();
   return 0;
 }

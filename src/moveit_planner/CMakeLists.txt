@@ -13,7 +13,6 @@ find_package(moveit_ros_planning_interface REQUIRED)
 find_package(moveit_ros_move_group REQUIRED)
 find_package(moveit_msgs REQUIRED)
 find_package(move_to_pose_srv REQUIRED)
-
 add_executable(collision_loader_node src/collision_loader.cpp)
 add_executable(moveit_commander_node src/moveit_commander.cpp)
 

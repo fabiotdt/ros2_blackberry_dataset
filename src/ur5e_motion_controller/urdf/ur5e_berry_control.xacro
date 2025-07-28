@@ -74,6 +74,7 @@
         use_fake_hardware="$(arg use_fake_hardware)"
         fake_sensor_commands="$(arg fake_sensor_commands)"
         headless_mode="$(arg headless_mode)"
+        initial_positions="${dict(shoulder_pan_joint=-1.57,shoulder_lift_joint=-1.57,elbow_joint=-1.70,wrist_1_joint=-1.57,wrist_2_joint=-1.57,wrist_3_joint=0.0)}"
     />
     <!--Create
     the control tag for the UR robot-->
