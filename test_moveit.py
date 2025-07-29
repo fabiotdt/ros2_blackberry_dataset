@@ -2,80 +2,92 @@ import rclpy
 from rclpy.node import Node
 
 from geometry_msgs.msg import PoseStamped
-from tf2_ros import Buffer, TransformListener
-
-import tf2_ros
-import time
 from move_to_pose_srv.srv import MoveToPose
+import random
+import numpy as np
+from scipy.spatial.transform import Rotation
 
 
-class TfToPosePublisher(Node):
+class RandomPoseSender(Node):
 
     def __init__(self):
-        super().__init__("tf_to_pose_publisher")
+        super().__init__("random_pose_sender")
 
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
-
-        self.timer = self.create_timer(0.1, self.timer_callback)
-        self.has_published = False
-
-        # Create a client to the MoveToPose service
         self.client = self.create_client(MoveToPose, "/move_to_pose")
+        self.has_sent_request = False
+        self.timer = self.create_timer(0.1, self.timer_callback)
+
+    def generate_random_pose(self):
+        pose = PoseStamped()
+        pose.header.stamp = self.get_clock().now().to_msg()
+        pose.header.frame_id = "base_link"
+
+        # Random position within reachable workspace
+        # Pos low -0.49403; 0.14853; 1.0647
+        # Pos up 0.55591; 0.37717; 1.3693
+        # Rot up 90 0 0
+        # Rot low 270 -150 150
+        pose.pose.position.x = random.uniform(-0.49403, 0.55591)
+        pose.pose.position.y = random.uniform(0.14853, 0.37717)
+        pose.pose.position.z = random.uniform(1.0647, 1.3693)
+
+        # Random orientation (Euler to Quaternion using scipy)
+        euler_x = random.uniform(90, 270)  # Roll
+        euler_y = random.uniform(-150, 0)  # Pitch
+        euler_z = random.uniform(0, 150)
+        quat = Rotation.from_euler(
+            "xyz", [euler_x, euler_y, euler_z], degrees=True
+        ).as_quat()
+
+        pose.pose.orientation.x = quat[0]
+        pose.pose.orientation.y = quat[1]
+        pose.pose.orientation.z = quat[2]
+        pose.pose.orientation.w = quat[3]
+
+        return pose
 
     def timer_callback(self):
-        if self.has_published:
+        if self.has_sent_request:
             return
 
-        try:
-            # Lookup transform from base_link to blackberry
-            transform = self.tf_buffer.lookup_transform(
-                "base_link",
-                "blackberry",
-                rclpy.time.Time(),
-                timeout=rclpy.duration.Duration(seconds=1.0),
-            )
+        if not self.client.service_is_ready():
+            self.get_logger().info("Waiting for /move_to_pose service...")
+            return
 
-            # Extract translation and rotation
-            trans = transform.transform.translation
-            rot = transform.transform.rotation
+        random_pose = self.generate_random_pose()
+        request = MoveToPose.Request()
+        request.pose = random_pose
 
-            # Apply small displacement (e.g., 0.1m in x)
-            displaced_pose = PoseStamped()
-            displaced_pose.header.stamp = self.get_clock().now().to_msg()
-            displaced_pose.header.frame_id = "base_link"
+        self.get_logger().info(
+            f"Sending random pose to robot:\n"
+            f"Position: {random_pose.pose.position}\n"
+            f"Orientation: {random_pose.pose.orientation}"
+        )
 
-            displaced_pose.pose.position.x = trans.x + 0.05  # displacement
-            displaced_pose.pose.position.y = trans.y
-            displaced_pose.pose.position.z = trans.z - 0.2  # displacement
-            displaced_pose.pose.orientation = rot  # keep original orientation
+        future = self.client.call_async(request)
+        self.has_sent_request = True
 
-            req = MoveToPose.Request()
-            req.pose = displaced_pose
-            self.client.call_async(req)
-
-            self.get_logger().info(
-                "Call srv with pose: "
-                + str(displaced_pose.pose.position)
-                + " with orientation: "
-                + str(displaced_pose.pose.orientation)
-            )
-            self.has_published = True
+        def response_callback(fut):
+            try:
+                response = fut.result()
+                if response.success:
+                    self.get_logger().info(
+                        "Robot successfully reached the random pose."
+                    )
+                else:
+                    self.get_logger().error("Robot failed to reach the pose.")
+            except Exception as e:
+                self.get_logger().error(f"Service call failed: {e}")
             rclpy.shutdown()
-            exit(0)
 
-        except Exception as e:
-            self.get_logger().warn(f"Could not get transform: {e}")
+        future.add_done_callback(response_callback)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = TfToPosePublisher()
-    while not node.client.wait_for_service(timeout_sec=1.0):
-        node.get_logger().info("Waiting for MoveToPose service...")
+    node = RandomPoseSender()
     rclpy.spin(node)
     node.destroy_node()
-    rclpy.shutdown()
 
 
 if __name__ == "__main__":

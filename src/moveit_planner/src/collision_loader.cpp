@@ -1,4 +1,3 @@
-#include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 
@@ -31,33 +30,6 @@ int main(int argc, char** argv) {
   auto tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
 
   // Setup PlanningSceneMonitor
-  auto planning_scene_monitor =
-      std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(
-          node, "robot_description", tf_buffer, "planning_scene_monitor");
-
-  if (!planning_scene_monitor->getPlanningScene()) {
-    RCLCPP_ERROR(LOGGER, "Planning scene not configured.");
-    return EXIT_FAILURE;
-  }
-  // print planning frame
-  // RCLCPP_INFO(LOGGER, "Planning frame: %s",
-  //             planning_scene_monitor->getPlanningFrame().c_str());
-
-  // Start monitoring
-  // planning_scene_monitor->startSceneMonitor();
-  // planning_scene_monitor->startStateMonitor("/joint_states");
-  // planning_scene_monitor->startWorldGeometryMonitor();  // Optional: for
-  // octomap
-  // planning_scene_monitor->setPlanningScenePublishingFrequency(25.0);
-  // planning_scene_monitor->startPublishingPlanningScene(
-  //     planning_scene_monitor::PlanningSceneMonitor::UPDATE_SCENE,
-  //     "/planning_scene");
-
-  // Wait for robot state to be ready
-  while (!planning_scene_monitor->getStateMonitor()->haveCompleteState()) {
-    RCLCPP_INFO(LOGGER, "Waiting for complete joint state...");
-    rclcpp::sleep_for(200ms);
-  }
 
   RCLCPP_INFO(LOGGER, "Robot state is ready. Adding collision objects...");
 
@@ -78,7 +50,7 @@ int main(int argc, char** argv) {
 
   // Electric panel
   primitives[1].type = primitives[1].BOX;
-  primitives[1].dimensions = {0.24, 1.0, 0.40};
+  primitives[1].dimensions = {0.24, 1.0, 0.35};
   poses[1].orientation.w = -0.707;
   poses[1].orientation.z = 0.707;
   poses[1].position.x = 0.0;
@@ -113,25 +85,25 @@ int main(int argc, char** argv) {
   poses[4].position.z = 0.92 - 0.06;
 
   // Add objects to planning scene
-  planning_scene_monitor::LockedPlanningSceneRW scene(planning_scene_monitor);
+  moveit_msgs::msg::PlanningScene planning_scene_msg;
+  planning_scene_msg.is_diff = true;
   for (size_t i = 0; i < object_ids.size(); ++i) {
-    moveit_msgs::msg::CollisionObject obj;
-    obj.header.frame_id = "base_link";
-    obj.id = object_ids[i];
-    obj.primitives.push_back(primitives[i]);
-    obj.primitive_poses.push_back(poses[i]);
-    obj.operation = obj.ADD;
-
-    scene->processCollisionObjectMsg(obj);
+    moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.id = object_ids[i];
+    collision_object.header.frame_id = "base_link";
+    collision_object.primitives.push_back(primitives[i]);
+    collision_object.primitive_poses.push_back(poses[i]);
+    collision_object.operation = moveit_msgs::msg::CollisionObject::ADD;
+    planning_scene_msg.world.collision_objects.push_back(collision_object);
   }
 
   // Publish the planning scene
   auto scene_pub = node->create_publisher<moveit_msgs::msg::PlanningScene>(
       "planning_scene", 1);
-  moveit_msgs::msg::PlanningScene planning_scene_msg;
-  scene->getPlanningSceneMsg(planning_scene_msg);
-  planning_scene_msg.is_diff = true;
-  scene_pub->publish(planning_scene_msg);
+  for (int i = 0; i < 10; ++i) {
+    rclcpp::sleep_for(100ms);  // Allow time for the publisher to be ready
+    scene_pub->publish(planning_scene_msg);
+  }
   RCLCPP_INFO(LOGGER, "Collision objects added to the planning scene.");
 
   // Keep node alive for a bit to ensure publishing occurs

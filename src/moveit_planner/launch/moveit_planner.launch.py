@@ -119,7 +119,7 @@ def generate_launch_description():
             ur_controller,
             moveit_planner,
             rviz_node,
-            # collision_loader,
+            collision_loader,
             # moveit_commander,
         ]
     )
