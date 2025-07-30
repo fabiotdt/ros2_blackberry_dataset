@@ -1,5 +1,0 @@
-# Pose stamped as request
-geometry_msgs/PoseStamped pose
----
-# Flag as response
-bool success

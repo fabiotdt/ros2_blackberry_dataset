@@ -7,7 +7,7 @@ def generate_launch_description():
         MoveItConfigsBuilder(
             "ur5e_motion_controller", package_name="ur5e_berry_moveit_config"
         )
-        .planning_pipelines(load_all=True)
+        .planning_pipelines("stomp")
         .to_moveit_configs()
     )
     return generate_move_group_launch(moveit_config)

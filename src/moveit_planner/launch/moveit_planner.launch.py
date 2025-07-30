@@ -35,9 +35,9 @@ def generate_launch_description():
         }.items(),
     )
 
-    # MoveIt planner after 5s
+    # MoveIt planner after 4s
     moveit_planner = TimerAction(
-        period=5.0,
+        period=4.0,
         actions=[
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
