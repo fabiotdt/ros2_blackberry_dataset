@@ -14,6 +14,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include <eigen3/Eigen/Core>       
 
 using moveit_msgs::srv::GetPositionIK;
 
@@ -47,17 +48,63 @@ class RandomPosePlannerWithIK : public rclcpp::Node {
     std::uniform_real_distribution<double> x_dist(-0.36895, 0.41608);
     std::uniform_real_distribution<double> y_dist(-0.25725, 0.76453);
     std::uniform_real_distribution<double> z_dist(0.39237, 0.72183);
-    std::uniform_real_distribution<double> roll_dist(90.0, 270.0);
-    std::uniform_real_distribution<double> pitch_dist(-150.0, 0.0);
-    std::uniform_real_distribution<double> yaw_dist(0.0, 150.0);
+
+    Eigen::Matrix3d rot_1_m = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d rot_1 = rot_1_m.eulerAngles(0, 1, 2);
+
+    Eigen::Matrix3d rot2_m = Eigen::Matrix3d::Identity();
+    rot2_m.row(0) << 1.0, 0.0, 0.0;
+    rot2_m.row(1) << 0.0, -1.0, 0.0;
+    rot2_m.row(2) << 0.0, 0.0, -1.0;
+    Eigen::Vector3d rot_2 = rot2_m.eulerAngles(0, 1, 2);
+
+    Eigen::Matrix3d rot_3_m = Eigen::Matrix3d::Identity();
+    rot_3_m.row(0) << 0.0, 0.0, -1.0;
+    rot_3_m.row(1) << 0.0, 1.0, 0.0;
+    rot_3_m.row(2) << 1.0, 0.0, 0.0;
+    // convert to RPY
+    Eigen::Vector3d rot_3 = rot_3_m.eulerAngles(0, 1, 2);
+    Eigen::Matrix3d rot_4_m = Eigen::Matrix3d::Identity();
+    rot_4_m.row(0) << 0.0, 0.0, 1.0;
+    rot_4_m.row(1) << 0.0, 1.0, 0.0;
+    rot_4_m.row(2) << -1.0, 0.0, 0.0;
+    // convert to RPY
+    Eigen::Vector3d rot_4 = rot_4_m.eulerAngles(0, 1, 2);
+
+    // compute boundaries
+    std::vector<double> roll_mins = {rot_1[0], rot_2[0], rot_3[0],
+                                     rot_4[0]};
+    double roll_min = *std::min_element(roll_mins.begin(), roll_mins.end());
+    std::vector<double> roll_maxs = {rot_1[0], rot_2[0], rot_3[0],
+                                      rot_4[0]};
+    double roll_max = *std::max_element(roll_maxs.begin(), roll_maxs.end());
+    std::vector<double> pitch_mins = {rot_1[1], rot_2[1], rot_3[1],
+                                      rot_4[1]};
+    std::vector<double> pitch_maxs = {rot_1[1], rot_2[1], rot_3[1],
+                                       rot_4[1]};
+    double pitch_min = *std::min_element(pitch_mins.begin(), pitch_mins.end());
+
+    double pitch_max = *std::max_element(pitch_maxs.begin(), pitch_maxs.end());
+
+    std::vector<double> yaw_mins = {rot_1[2], rot_2[2], rot_3[2],
+                                    rot_4[2]};
+    double yaw_min = *std::min_element(yaw_mins.begin(), yaw_mins.end());
+    std::vector<double> yaw_maxs = {rot_1[2], rot_2[2], rot_3[2],
+                                     rot_4[2]};
+    double yaw_max = *std::max_element(yaw_maxs.begin(), yaw_maxs.end());
+
+    std::uniform_real_distribution<double> roll_dist(roll_min, roll_max);
+    std::uniform_real_distribution<double> pitch_dist(pitch_min, pitch_max);
+    std::uniform_real_distribution<double> yaw_dist(yaw_min, yaw_max);
+
 
     pose.pose.position.x = x_dist(gen);
     pose.pose.position.y = y_dist(gen);
     pose.pose.position.z = z_dist(gen);
 
-    double roll = roll_dist(gen) * M_PI / 180.0;
-    double pitch = pitch_dist(gen) * M_PI / 180.0;
-    double yaw = yaw_dist(gen) * M_PI / 180.0;
+    double roll = roll_dist(gen);
+    double pitch = pitch_dist(gen);
+    double yaw = yaw_dist(gen);
 
     tf2::Quaternion quat;
     quat.setRPY(roll, pitch, yaw);
