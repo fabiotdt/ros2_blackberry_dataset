@@ -9,10 +9,8 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
-    ur_description_pkg = get_package_share_directory('ur_description')
-    motion_controller_pkg = get_package_share_directory('ur5e_motion_controller')
-    ur_simulation_pkg = get_package_share_directory('ur_simulation_gz')
-
+    motion_controller_pkg = get_package_share_directory('moveit_planner')
+    calibration_pkg = get_package_share_directory('easy_handeye2')
     return LaunchDescription([
 
         # Declare toggle arguments
@@ -34,32 +32,8 @@ def generate_launch_description():
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                os.path.join(motion_controller_pkg, 'launch', 'ur5e.launch.py')
+                os.path.join(motion_controller_pkg, 'launch', 'moveit_planner.launch.py')
             )
-        ),
-        Node(
-            package='ur5e_motion_controller',
-            executable='berry_pose_publisher',
-            name='berry_pose_publisher',
-            output='screen',
-        ),
-
-        # State publisher node (your own)
-        Node(
-            package='ur5e_motion_controller',
-            executable='arm_state_publisher',
-            name='arm_state_publisher',
-            output='screen',
-        ),
-
-        # motion_executor node with keyboard input support
-        Node(
-            package='ur5e_motion_controller',
-            executable='motion_executor',
-            name='motion_executor',
-            output='screen',
-            emulate_tty=True,  # enables keyboard input. Not working.
-            condition=IfCondition(LaunchConfiguration('run_motion'))
         ),
 
         # RealSense streamer node
@@ -69,6 +43,12 @@ def generate_launch_description():
             name='realsense_streamer',
             output='screen',
             condition=IfCondition(LaunchConfiguration('run_realsense'))
+        ),
+        # Camer tf publisher
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(calibration_pkg, 'launch', 'publish.launch.py')
+            )
         ),
 
         # Berry saver node

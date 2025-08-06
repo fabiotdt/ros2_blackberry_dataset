@@ -1,41 +1,56 @@
+#include <rclcpp/rclcpp.hpp>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/robot_state/conversions.h>
-
-#include <algorithm>
-#include <cmath>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <map>
-#include <memory>
 #include <moveit_msgs/srv/get_position_ik.hpp>
-#include <random>
-#include <rclcpp/rclcpp.hpp>
-#include <string>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <std_srvs/srv/trigger.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <thread>
-#include <utility>
+#include "json.hpp"
+
+#include <fstream>
+#include <filesystem>
+#include <random>
 #include <vector>
-#include <eigen3/Eigen/Core>       
+#include <map>
+#include <algorithm>
+#include <thread>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Geometry>
 
+using json = nlohmann::json;
 using moveit_msgs::srv::GetPositionIK;
+namespace fs = std::filesystem;
 
-class RandomPosePlannerWithIK : public rclcpp::Node {
- public:
+class RandomPosePlannerWithIK : public rclcpp::Node
+{
+public:
   RandomPosePlannerWithIK()
-      : Node("random_pose_planner_with_ik"),
-        move_group_(std::shared_ptr<rclcpp::Node>(this), "ur_arm") {
+    : Node("random_pose_planner_with_ik"), move_group_(std::shared_ptr<rclcpp::Node>(this), "ur_arm")
+  {
     ik_client_ = this->create_client<GetPositionIK>("/compute_ik");
+    save_data_client_ = this->create_client<std_srvs::srv::Trigger>("save_berry_data");
 
-    pose_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
-        "target_pose", 10);
+    pose_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("target_pose", 10);
 
-    while (!ik_client_->wait_for_service(std::chrono::seconds(1))) {
+    while (!ik_client_->wait_for_service(std::chrono::seconds(1)))
+    {
       RCLCPP_INFO(this->get_logger(), "Waiting for /compute_ik service...");
     }
-
-    RCLCPP_INFO(this->get_logger(), "Random Pose Planner with IK started.");
+    while (!save_data_client_->wait_for_service(std::chrono::seconds(1)))
+    {
+      RCLCPP_INFO(this->get_logger(), "Waiting for save_berry_data service...");
+    }
   }
 
-  geometry_msgs::msg::PoseStamped generateRandomPose() {
+  moveit::planning_interface::MoveGroupInterface move_group_;
+  rclcpp::Client<GetPositionIK>::SharedPtr ik_client_;
+  rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr save_data_client_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
+
+  std::vector<std::pair<geometry_msgs::msg::PoseStamped, std::vector<double>>> poses_;  // pose + joint values
+
+  geometry_msgs::msg::PoseStamped generateRandomPose()
+  {
     geometry_msgs::msg::PoseStamped pose;
     pose.header.frame_id = "base_link";
     pose.header.stamp = this->now();
@@ -43,60 +58,20 @@ class RandomPosePlannerWithIK : public rclcpp::Node {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    // 0.41608; 0.25725; 0.72183
-    // -0.36895; 0.76453; 0.39237
-    std::uniform_real_distribution<double> x_dist(-0.36895, 0.41608);
-    std::uniform_real_distribution<double> y_dist(-0.25725, 0.76453);
-    std::uniform_real_distribution<double> z_dist(0.39237, 0.72183);
+    //   0.45; 0.0; 0.66
+    //   -0.45; 0.6; 0.1
 
-    Eigen::Matrix3d rot_1_m = Eigen::Matrix3d::Identity();
-    Eigen::Vector3d rot_1 = rot_1_m.eulerAngles(0, 1, 2);
+    // std::uniform_real_distribution<double> x_dist(-0.36895, 0.41608);
+    // std::uniform_real_distribution<double> y_dist(-0.25725, 0.76453);
+    // std::uniform_real_distribution<double> z_dist(0.39237, 0.72183);
 
-    Eigen::Matrix3d rot2_m = Eigen::Matrix3d::Identity();
-    rot2_m.row(0) << 1.0, 0.0, 0.0;
-    rot2_m.row(1) << 0.0, -1.0, 0.0;
-    rot2_m.row(2) << 0.0, 0.0, -1.0;
-    Eigen::Vector3d rot_2 = rot2_m.eulerAngles(0, 1, 2);
+    std::uniform_real_distribution<double> x_dist(-0.45, 0.45);
+    std::uniform_real_distribution<double> y_dist(-0.6, 0.6);
+    std::uniform_real_distribution<double> z_dist(0.1, 0.66);
 
-    Eigen::Matrix3d rot_3_m = Eigen::Matrix3d::Identity();
-    rot_3_m.row(0) << 0.0, 0.0, -1.0;
-    rot_3_m.row(1) << 0.0, 1.0, 0.0;
-    rot_3_m.row(2) << 1.0, 0.0, 0.0;
-    // convert to RPY
-    Eigen::Vector3d rot_3 = rot_3_m.eulerAngles(0, 1, 2);
-    Eigen::Matrix3d rot_4_m = Eigen::Matrix3d::Identity();
-    rot_4_m.row(0) << 0.0, 0.0, 1.0;
-    rot_4_m.row(1) << 0.0, 1.0, 0.0;
-    rot_4_m.row(2) << -1.0, 0.0, 0.0;
-    // convert to RPY
-    Eigen::Vector3d rot_4 = rot_4_m.eulerAngles(0, 1, 2);
-
-    // compute boundaries
-    std::vector<double> roll_mins = {rot_1[0], rot_2[0], rot_3[0],
-                                     rot_4[0]};
-    double roll_min = *std::min_element(roll_mins.begin(), roll_mins.end());
-    std::vector<double> roll_maxs = {rot_1[0], rot_2[0], rot_3[0],
-                                      rot_4[0]};
-    double roll_max = *std::max_element(roll_maxs.begin(), roll_maxs.end());
-    std::vector<double> pitch_mins = {rot_1[1], rot_2[1], rot_3[1],
-                                      rot_4[1]};
-    std::vector<double> pitch_maxs = {rot_1[1], rot_2[1], rot_3[1],
-                                       rot_4[1]};
-    double pitch_min = *std::min_element(pitch_mins.begin(), pitch_mins.end());
-
-    double pitch_max = *std::max_element(pitch_maxs.begin(), pitch_maxs.end());
-
-    std::vector<double> yaw_mins = {rot_1[2], rot_2[2], rot_3[2],
-                                    rot_4[2]};
-    double yaw_min = *std::min_element(yaw_mins.begin(), yaw_mins.end());
-    std::vector<double> yaw_maxs = {rot_1[2], rot_2[2], rot_3[2],
-                                     rot_4[2]};
-    double yaw_max = *std::max_element(yaw_maxs.begin(), yaw_maxs.end());
-
-    std::uniform_real_distribution<double> roll_dist(roll_min, roll_max);
-    std::uniform_real_distribution<double> pitch_dist(pitch_min, pitch_max);
-    std::uniform_real_distribution<double> yaw_dist(yaw_min, yaw_max);
-
+    std::uniform_real_distribution<double> roll_dist(-M_PI, M_PI);
+    std::uniform_real_distribution<double> pitch_dist(-M_PI / 2, M_PI / 2);
+    std::uniform_real_distribution<double> yaw_dist(-M_PI, M_PI);
 
     pose.pose.position.x = x_dist(gen);
     pose.pose.position.y = y_dist(gen);
@@ -113,152 +88,186 @@ class RandomPosePlannerWithIK : public rclcpp::Node {
     return pose;
   }
 
-  static double jointDistance(const std::vector<double> &a,
-                              const std::vector<double> &b) {
-    if (a.size() != b.size()) {
-      throw std::runtime_error("Joint vectors must have the same size");
-    }
+  static double jointDistance(const std::vector<double>& a, const std::vector<double>& b)
+  {
     double sum_sq = 0.0;
-    for (size_t i = 0; i < a.size(); ++i) {
-      double diff = a[i] - b[i];
-      sum_sq += diff * diff;
-    }
+    for (size_t i = 0; i < a.size(); ++i)
+      sum_sq += std::pow(a[i] - b[i], 2);
     return std::sqrt(sum_sq);
   }
 
-  void generateAndSortPosesByJointDistance(size_t count = 1000) {
-    rclcpp::sleep_for(std::chrono::seconds(1));
+  void generateAndSavePoses(size_t count)
+  {
+    rclcpp::sleep_for(std::chrono::seconds(2));
     std::vector<std::string> joint_names = move_group_.getJointNames();
     std::vector<double> reference_joints = move_group_.getCurrentJointValues();
+    std::vector<std::pair<geometry_msgs::msg::PoseStamped, std::vector<double>>> valid_poses;
 
-    if (reference_joints.empty()) {
-      RCLCPP_ERROR(this->get_logger(),
-                   "Failed to get current robot joint state.");
-      return;
-    }
-
-    std::vector<std::pair<geometry_msgs::msg::PoseStamped,
-                          moveit_msgs::msg::RobotState>>
-        valid_poses;
-
-    for (size_t i = 0; i < count; ++i) {
+    for (size_t i = 0; i < count; ++i)
+    {
       auto pose = generateRandomPose();
-
+      RCLCPP_INFO(this->get_logger(), "Generated pose %zu: [%f, %f, %f] [%f, %f, %f, %f]",
+                  i, pose.pose.position.x, pose.pose.position.y, pose.pose.position.z,
+                  pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z,
+                  pose.pose.orientation.w);
       auto request = std::make_shared<GetPositionIK::Request>();
       request->ik_request.group_name = "ur_arm";
       request->ik_request.pose_stamped = pose;
       request->ik_request.timeout = rclcpp::Duration::from_seconds(0.2);
 
       auto future = ik_client_->async_send_request(request);
-
-      while (rclcpp::ok()) {
+      while (rclcpp::ok())
+      {
         auto status = future.wait_for(std::chrono::milliseconds(10));
-        if (status == std::future_status::ready) break;
+        if (status == std::future_status::ready)
+        {
+          break;
+        }
       }
-
-      if (!rclcpp::ok()) {
-        RCLCPP_WARN(this->get_logger(), "ROS shutdown during IK query.");
-        return;
-      }
-
       auto response = future.get();
-      if (response->error_code.val ==
-          moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {
-        valid_poses.emplace_back(pose, response->solution);
-        RCLCPP_INFO(this->get_logger(), "Pose %zu IK success", i + 1);
-      } else {
-        RCLCPP_DEBUG(this->get_logger(), "Pose %zu IK failed", i + 1);
-      }
-    }
-
-    RCLCPP_INFO(this->get_logger(), "Generated %zu valid poses. Sorting...",
-                valid_poses.size());
-
-    auto extractJoints =
-        [&](const moveit_msgs::msg::RobotState &state) -> std::vector<double> {
-      std::map<std::string, double> joint_map;
-      for (size_t i = 0; i < state.joint_state.name.size(); ++i) {
-        joint_map[state.joint_state.name[i]] = state.joint_state.position[i];
-      }
-
-      std::vector<double> result;
-      for (const auto &name : joint_names) {
-        auto it = joint_map.find(name);
-        if (it != joint_map.end()) {
-          result.push_back(it->second);
-        } else {
-          throw std::runtime_error("Missing joint " + name +
-                                   " in IK solution.");
-        }
-      }
-      return result;
-    };
-
-    std::sort(valid_poses.begin(), valid_poses.end(),
-              [&](const auto &a, const auto &b) {
-                auto joints_a = extractJoints(a.second);
-                auto joints_b = extractJoints(b.second);
-                return jointDistance(joints_a, reference_joints) <
-                       jointDistance(joints_b, reference_joints);
-              });
-
-    RCLCPP_INFO(this->get_logger(), "Sorting done. Top 5 poses:");
-    for (size_t i = 0; i < std::min(valid_poses.size(), size_t(5)); ++i) {
-      const auto &pose = valid_poses[i].first.pose;
-      auto joints = extractJoints(valid_poses[i].second);
-      double dist = jointDistance(joints, reference_joints);
-      RCLCPP_INFO(this->get_logger(),
-                  "Pose %zu: pos=(%.3f, %.3f, %.3f), joint dist=%.4f", i + 1,
-                  pose.position.x, pose.position.y, pose.position.z, dist);
-    }
-
-    for (size_t i = 0; i < valid_poses.size(); ++i) {
-      try {
-        auto joint_target = extractJoints(valid_poses[i].second);
-        move_group_.setJointValueTarget(joint_target);
-
-        moveit::planning_interface::MoveGroupInterface::Plan plan;
-        bool success = static_cast<bool>(move_group_.plan(plan));
-
-        if (success) {
-          RCLCPP_INFO(this->get_logger(),
-                      "Planning succeeded for Pose %zu. Executing...", i + 1);
-
-          // 🔽 Publish pose for RViz visualization
-          pose_pub_->publish(valid_poses[i].first);
-
-          auto exec_result = move_group_.execute(plan);
-          if (!exec_result) {
-            RCLCPP_WARN(this->get_logger(),
-                        "Execution failed for Pose %zu (error code %d)", i + 1,
-                        exec_result.val);
+      if (response->error_code.val == moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+      {
+        std::vector<double> joints;
+        for (const auto& name : joint_names)
+        {
+          auto it =
+              std::find(response->solution.joint_state.name.begin(), response->solution.joint_state.name.end(), name);
+          if (it != response->solution.joint_state.name.end())
+          {
+            size_t idx = std::distance(response->solution.joint_state.name.begin(), it);
+            joints.push_back(response->solution.joint_state.position[idx]);
           }
-        } else {
-          RCLCPP_WARN(this->get_logger(),
-                      "Planning failed for Pose %zu. Skipping.", i + 1);
+        }
+        valid_poses.emplace_back(pose, joints);
+      }
+    }
+    std::sort(valid_poses.begin(), valid_poses.end(), [&](const auto& a, const auto& b) {
+      return jointDistance(a.second, reference_joints) < jointDistance(b.second, reference_joints);
+    });
+
+    // Save to JSON
+    json poses_json = json::array();
+    for (const auto& [pose, joints] : valid_poses)
+    {
+      json entry;
+      entry["position"] = { pose.pose.position.x, pose.pose.position.y, pose.pose.position.z };
+      entry["orientation"] = { pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z,
+                               pose.pose.orientation.w };
+      entry["joints"] = joints;
+      poses_json.push_back(entry);
+    }
+    std::ofstream("poses.json") << poses_json.dump(2);
+
+    // Load into memory
+    poses_ = valid_poses;
+  }
+
+  void loadPosesAndExecute()
+  {
+    std::ifstream f("poses.json");
+    json poses_json;
+    f >> poses_json;
+
+    for (const auto& entry : poses_json)
+    {
+      geometry_msgs::msg::PoseStamped pose;
+      pose.header.frame_id = "base_link";
+      pose.pose.position.x = entry["position"][0];
+      pose.pose.position.y = entry["position"][1];
+      pose.pose.position.z = entry["position"][2];
+      pose.pose.orientation.x = entry["orientation"][0];
+      pose.pose.orientation.y = entry["orientation"][1];
+      pose.pose.orientation.z = entry["orientation"][2];
+      pose.pose.orientation.w = entry["orientation"][3];
+
+      std::vector<double> joints = entry["joints"].get<std::vector<double>>();
+      poses_.emplace_back(pose, joints);
+    }
+
+    executeFromPoses();
+  }
+
+  void executeFromPoses()
+  {
+    size_t resume_index = 0;
+    std::ifstream progress_in("progress.json");
+    if (progress_in)
+    {
+      json progress;
+      progress_in >> progress;
+      resume_index = progress.value("last_index", 0);
+      RCLCPP_WARN(this->get_logger(), "Resuming from index %zu", resume_index);
+    }
+
+    for (size_t i = resume_index; i < poses_.size(); ++i)
+    {
+      const auto& [pose, joints] = poses_[i];
+      try
+      {
+        move_group_.setJointValueTarget(joints);
+        moveit::planning_interface::MoveGroupInterface::Plan plan;
+        if (!move_group_.plan(plan))
+        {
+          RCLCPP_WARN(this->get_logger(), "Planning failed for pose %zu", i);
+          continue;
         }
 
-        rclcpp::sleep_for(std::chrono::milliseconds(500));
+        pose_pub_->publish(pose);
 
-      } catch (const std::exception &e) {
-        RCLCPP_ERROR(this->get_logger(), "Error processing Pose %zu: %s", i + 1,
-                     e.what());
+        auto result = move_group_.execute(plan);
+        if (!result)
+        {
+          RCLCPP_WARN(this->get_logger(), "Execution failed for pose %zu", i);
+          continue;
+        }
+
+        // Save progress
+        std::ofstream("progress.json") << json({ { "last_index", i + 1 } }).dump(2);
+
+        // Call trigger
+        auto req = std::make_shared<std_srvs::srv::Trigger::Request>();
+        auto future = save_data_client_->async_send_request(req);
+        if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future) ==
+            rclcpp::FutureReturnCode::SUCCESS)
+        {
+          auto res = future.get();
+          if (res->success)
+          {
+            RCLCPP_INFO(this->get_logger(), "Trigger service: %s", res->message.c_str());
+          }
+          else
+          {
+            RCLCPP_WARN(this->get_logger(), "Trigger failed: %s", res->message.c_str());
+          }
+        }
+
+        rclcpp::sleep_for(std::chrono::milliseconds(1000));
+      }
+      catch (const std::exception& e)
+      {
+        RCLCPP_ERROR(this->get_logger(), "Exception at pose %zu: %s", i, e.what());
       }
     }
   }
-
- private:
-  moveit::planning_interface::MoveGroupInterface move_group_;
-  rclcpp::Client<GetPositionIK>::SharedPtr ik_client_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
   rclcpp::init(argc, argv);
   auto node = std::make_shared<RandomPosePlannerWithIK>();
-  std::thread spin_thread([&]() { rclcpp::spin(node); });
-  spin_thread.detach();
-  node->generateAndSortPosesByJointDistance(100);
+  std::thread([&]() { rclcpp::spin(node); }).detach();
+
+  if (fs::exists("poses.json"))
+  {
+    RCLCPP_INFO(node->get_logger(), "Found existing poses.json. Loading poses...");
+    node->loadPosesAndExecute();
+  }
+  else
+  {
+    RCLCPP_INFO(node->get_logger(), "No poses.json found. Generating poses...");
+    node->generateAndSavePoses(5000);  // You can change the count here
+    node->executeFromPoses();
+  }
   rclcpp::shutdown();
   return 0;
 }

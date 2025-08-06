@@ -34,7 +34,7 @@ def generate_launch_description():
             "use_fake_hardware": use_fake_hardware,
         }.items(),
     )
-
+        
     # MoveIt planner after 4s
     moveit_planner = TimerAction(
         period=4.0,

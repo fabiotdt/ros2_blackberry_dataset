@@ -35,8 +35,8 @@ class BerryDataset:
             self.idx = self.dataset['berry_id'].max() + 1 if not self.dataset.empty else 0
                     
         else: # If the dataset does not exist: create it
-            columns = ['arm_T_matrix',    # T matrix of the last joint of the arm
-                        'berry_T_matrix', # T matrix of the tip of the blackberry
+            columns = ['base_T_berry',    # T matrix of the last joint of the arm
+                        'cam_T_berry', # T matrix of the tip of the blackberry
                         'berry_id',       # Berry progressive id --> also in the name of the saved files
                         'camera_intrin'] # Camera intrinsic parameters       
             self.dataset = pd.DataFrame(columns=columns)
@@ -45,8 +45,8 @@ class BerryDataset:
     def save_data(self, arm_pose, berry_pose, camera_intrin=None):
         
         new_data = {   
-                'arm_T_matrix': [arm_pose],   
-                'berry_T_matrix' : [berry_pose],
+                'base_T_berry': [arm_pose],   
+                'cam_T_berry' : [berry_pose],
                 'berry_id' : [self.idx],
                 'camera_intrin' : [camera_intrin] 
             }

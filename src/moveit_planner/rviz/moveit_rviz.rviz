@@ -1,12 +1,17 @@
 Panels:
   - Class: rviz_common/Displays
-    Help Height: 85
+    Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /MotionPlanning1
+        - /MotionPlanning1/Scene Robot1
+        - /MotionPlanning1/Planning Request1
+        - /MotionPlanning1/Planning Metrics1
+        - /Pose1
       Splitter Ratio: 0.5
-    Tree Height: 177
+    Tree Height: 169
   - Class: rviz_common/Help
     Name: Help
   - Class: rviz_common/Views
@@ -130,11 +135,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-        Loop Animation: true
+        Loop Animation: false
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
         Show Robot Collision: false
-        Show Robot Visual: true
+        Show Robot Visual: false
         Show Trail: false
         State Display Time: 0.05 s
         Trail Step Size: 1
@@ -154,7 +159,7 @@ Visualization Manager:
         Interactive Marker Size: 0
         Joint Violation Color: 255; 0; 255
         Planning Group: ur_arm
-        Query Goal State: true
+        Query Goal State: false
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -245,6 +250,26 @@ Visualization Manager:
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 0.1
+    - Alpha: 1
+      Axes Length: 0.10000000149011612
+      Axes Radius: 0.019999999552965164
+      Class: rviz_default_plugins/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Axes
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /target_pose
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -263,41 +288,41 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.3440310955047607
+      Distance: 3.047025442123413
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.32569265365600586
-        Y: -0.1728956252336502
-        Z: 0.9741053581237793
-      Focal Shape Fixed Size: true
+        X: -0.5333150029182434
+        Y: -0.15851135551929474
+        Z: 0.82871013879776
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3650001287460327
+      Pitch: 0.3303983509540558
       Target Frame: world
       Value: Orbit (rviz_default_plugins)
-      Yaw: 1.1670001745224
+      Yaw: 1.0053977966308594
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
-  Height: 1548
+    collapsed: true
+  Height: 1016
   Help:
     collapsed: false
-  Hide Left Dock: false
+  Hide Left Dock: true
   Hide Right Dock: false
   MotionPlanning:
-    collapsed: false
+    collapsed: true
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000001000000000000034700000592fc0200000005fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000005f00fffffffb000000100044006900730070006c00610079007301000000500000015f0000010300fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001b6000002fa0000023200fffffffb0000000800480065006c0070000000029a0000006e0000008d00fffffffb0000000a0056006900650077007301000004b70000012b000000dd00ffffff0000042f0000059200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000010000000000000347000003a2fc0200000005fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003f00fffffffb000000100044006900730070006c006100790073000000003b000000e4000000c700fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670000000125000001f00000016900fffffffb0000000800480065006c0070000000029a0000006e0000006e00fffffffb0000000a00560069006500770073000000031b000000c2000000a000ffffff000004f0000003a200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
-    collapsed: false
-  Width: 1917
-  X: 318
-  Y: 7
+    collapsed: true
+  Width: 1264
+  X: 656
+  Y: 27
